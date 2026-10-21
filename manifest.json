@@ -1,0 +1,936 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.qempexe.plume",
+  "name": "Plume",
+  "version": "1.0.0",
+  "author": "qempexe",
+  "license": "MIT",
+  "description": "Design your own cursor (14 arrows, 30 surfaces, 22 lines, 18 ornaments, shadows, and every other cursor drawn to match) and give your pointer live effects: 6 trails, 6 halos, 8 color modes, shake to find, ready made and saved looks, from one settings panel.",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "qml/Service.qml",
+    "barWidget": "qml/BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Plume",
+    "description": "Your own cursor, pointer trails and halos",
+    "category": "Appearance",
+    "aliases": [
+      "cursor",
+      "pointer",
+      "mouse",
+      "trail",
+      "effects"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "trail": "comet",
+      "trailLife": 45,
+      "trailSize": 8,
+      "trailStrength": 85,
+      "halo": "glow",
+      "haloSize": 64,
+      "haloStrength": 70,
+      "haloShow": "always",
+      "colorMode": "theme",
+      "customColor": "#7aa2f7",
+      "customColor2": "#f7768e",
+      "panelColor": "theme",
+      "panelBg": "#141414",
+      "panelFg": "#e0e0e0",
+      "panelCustomColor": "#ff6a1f",
+      "panelText": "auto",
+      "panelFrame": false,
+      "panelFrameGradient": true,
+      "panelFrameColor": "accent",
+      "panelTint": 0,
+      "panelOpacity": 97,
+      "pointerTheme": "",
+      "pointerSize": 24,
+      "cursorShape": "classic",
+      "cursorTilt": 0,
+      "cursorRound": 30,
+      "cursorSurface": "filled",
+      "cursorFill": "solid",
+      "cursorGradientTo": "second",
+      "cursorGradientDir": "along",
+      "cursorPattern": "none",
+      "cursorDepth": "flat",
+      "cursorOpacity": 100,
+      "cursorTint": 0,
+      "cursorColor": "foreground",
+      "cursorColorCustom": "#7aa2f7",
+      "cursorColor2": "accent",
+      "cursorColor2Custom": "#f7768e",
+      "cursorLine": "solid",
+      "cursorLineColor": "auto",
+      "cursorLineCustom": "#101010",
+      "cursorLineWidth": 2,
+      "cursorLineGradient": false,
+      "cursorLineFadeTo": "lighter",
+      "cursorLineFadeDir": "along",
+      "cursorOrnament": "none",
+      "cursorOrnamentSize": 7,
+      "cursorOrnamentsOn": "arrow",
+      "cursorCap": "none",
+      "cursorDetail": "none",
+      "cursorShadow": "soft",
+      "cursorShadowColor": "dark",
+      "cursorShadowDir": "below",
+      "cursorShadowStrength": 60,
+      "cursorHand": "hand",
+      "cursorBeam": "beam",
+      "cursorBusy": "ring",
+      "cursorBusySpeed": "normal",
+      "hideAfter": "keep",
+      "hideTyping": "keep",
+      "shake": true,
+      "shakeSensitivity": 5,
+      "findSize": 60,
+      "enabled": true,
+      "fullscreen": "hide",
+      "fps": "60",
+      "wheelLooks": true,
+      "startLook": "keep"
+    },
+    "schema": [
+      {
+        "key": "trail",
+        "type": "enum",
+        "label": "Trail",
+        "options": [
+          "none",
+          "comet",
+          "beads",
+          "ribbon",
+          "sparks",
+          "echoes",
+          "bubbles"
+        ],
+        "defaultValue": "comet",
+        "description": "What the pointer leaves behind as it moves. Options: none, comet, beads, ribbon, sparks, echoes, bubbles."
+      },
+      {
+        "key": "trailLife",
+        "type": "integer",
+        "label": "Length",
+        "min": 15,
+        "max": 150,
+        "step": 5,
+        "defaultValue": 45,
+        "description": "How long the trail stays, in seconds."
+      },
+      {
+        "key": "trailSize",
+        "type": "integer",
+        "label": "Thickness",
+        "min": 2,
+        "max": 30,
+        "step": 1,
+        "defaultValue": 8,
+        "description": "Thickness."
+      },
+      {
+        "key": "trailStrength",
+        "type": "integer",
+        "label": "Strength",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 85,
+        "description": "How solid it is: low is a faint wisp."
+      },
+      {
+        "key": "halo",
+        "type": "enum",
+        "label": "Halo",
+        "options": [
+          "none",
+          "glow",
+          "ring",
+          "pulse",
+          "spotlight",
+          "crosshair",
+          "target"
+        ],
+        "defaultValue": "glow",
+        "description": "What sits around the pointer. Options: none, glow, ring, pulse, spotlight, crosshair, target."
+      },
+      {
+        "key": "haloSize",
+        "type": "integer",
+        "label": "Size",
+        "min": 20,
+        "max": 240,
+        "step": 4,
+        "defaultValue": 64,
+        "description": "Size."
+      },
+      {
+        "key": "haloStrength",
+        "type": "integer",
+        "label": "Strength",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 70,
+        "description": "Strength."
+      },
+      {
+        "key": "haloShow",
+        "type": "enum",
+        "label": "Show",
+        "options": [
+          "always",
+          "moving",
+          "still"
+        ],
+        "defaultValue": "always",
+        "description": "When still waits a moment after the pointer stops, then fades in. Options: always, moving (While moving), still (When still)."
+      },
+      {
+        "key": "colorMode",
+        "type": "enum",
+        "label": "Color",
+        "options": [
+          "theme",
+          "palette",
+          "border",
+          "custom",
+          "gradient",
+          "rainbow",
+          "fade",
+          "speed"
+        ],
+        "defaultValue": "theme",
+        "description": "Options: theme, palette (Theme palette), border (Window border), custom, gradient, rainbow, fade (Drift), speed."
+      },
+      {
+        "key": "customColor",
+        "type": "string",
+        "label": "Color",
+        "defaultValue": "#7aa2f7",
+        "description": "Pick one, or type a hex. A hex color like #7aa2f7."
+      },
+      {
+        "key": "customColor2",
+        "type": "string",
+        "label": "Second color",
+        "defaultValue": "#f7768e",
+        "description": "Where the gradient ends. A hex color like #7aa2f7."
+      },
+      {
+        "key": "panelColor",
+        "type": "enum",
+        "label": "Panel colors",
+        "options": [
+          "theme",
+          "palette",
+          "borders",
+          "custom",
+          "monochrome"
+        ],
+        "defaultValue": "theme",
+        "description": "Follow theme matches your Omarchy theme live. Theme palette gives every tab its own color from the theme. Window borders takes the colors of your window border, gradient and all. Custom lets you choose the background, text and accent. Monochrome removes every hue. Options: theme (Follow theme), palette (Theme palette), borders (Window borders), custom, monochrome."
+      },
+      {
+        "key": "panelBg",
+        "type": "string",
+        "label": "Background",
+        "defaultValue": "#141414",
+        "description": "A hex color like #7aa2f7."
+      },
+      {
+        "key": "panelFg",
+        "type": "string",
+        "label": "Text",
+        "defaultValue": "#e0e0e0",
+        "description": "Also used anywhere when Text is set to My text color. A hex color like #7aa2f7."
+      },
+      {
+        "key": "panelCustomColor",
+        "type": "string",
+        "label": "Accent",
+        "defaultValue": "#ff6a1f",
+        "description": "A hex color like #7aa2f7."
+      },
+      {
+        "key": "panelText",
+        "type": "enum",
+        "label": "Text",
+        "options": [
+          "auto",
+          "theme",
+          "custom"
+        ],
+        "defaultValue": "auto",
+        "description": "Always readable keeps the theme's text color, and switches to black or white when the panel is too light or too dark for it. My text color uses the Text color above. Options: auto (Always readable), theme, custom (My text color)."
+      },
+      {
+        "key": "panelFrame",
+        "type": "boolean",
+        "label": "Panel outline",
+        "defaultValue": false,
+        "description": "Draw the panel's edge in color instead of a plain neutral line."
+      },
+      {
+        "key": "panelFrameGradient",
+        "type": "boolean",
+        "label": "Outline gradient",
+        "defaultValue": true,
+        "description": "When your window border is a gradient, the outline runs through all its colors, at the same angle."
+      },
+      {
+        "key": "panelFrameColor",
+        "type": "enum",
+        "label": "Outline color",
+        "options": [
+          "accent",
+          "first",
+          "middle",
+          "last"
+        ],
+        "defaultValue": "accent",
+        "description": "The one color of the outline when it isn't a gradient. Falls back to the accent when your theme has no window border. Options: accent, first (Border's first), middle (Border's middle), last (Border's last)."
+      },
+      {
+        "key": "panelTint",
+        "type": "integer",
+        "label": "Panel tint",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "defaultValue": 0,
+        "description": "How much of the accent color washes over the panel. 0 keeps it plain."
+      },
+      {
+        "key": "panelOpacity",
+        "type": "integer",
+        "label": "Panel opacity",
+        "min": 50,
+        "max": 100,
+        "step": 1,
+        "defaultValue": 97,
+        "description": "How solid the panel is. Lower lets your wallpaper show through."
+      },
+      {
+        "key": "pointerTheme",
+        "type": "string",
+        "label": "Cursor",
+        "defaultValue": "",
+        "description": "A cursor theme's folder name, *plume for the cursor made in Plume, or empty to leave the cursor as Omarchy sets it."
+      },
+      {
+        "key": "pointerSize",
+        "type": "integer",
+        "label": "Size",
+        "min": 16,
+        "max": 96,
+        "step": 2,
+        "defaultValue": 24,
+        "description": "Size."
+      },
+      {
+        "key": "cursorShape",
+        "type": "enum",
+        "label": "Arrow",
+        "options": [
+          "classic",
+          "slim",
+          "chunky",
+          "wedge",
+          "dart",
+          "kite",
+          "needle",
+          "teardrop",
+          "leaf",
+          "bullet",
+          "crest",
+          "chevron",
+          "feather",
+          "dot"
+        ],
+        "defaultValue": "classic",
+        "description": "Options: classic, slim, chunky, wedge, dart, kite, needle, teardrop, leaf, bullet, crest, chevron, feather, dot."
+      },
+      {
+        "key": "cursorTilt",
+        "type": "integer",
+        "label": "Tilt",
+        "min": -30,
+        "max": 30,
+        "step": 2,
+        "defaultValue": 0,
+        "description": "Turns the arrow about its tip, in degrees."
+      },
+      {
+        "key": "cursorRound",
+        "type": "integer",
+        "label": "Round corners",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 30,
+        "description": "Sharp at 0, soft and pebbly at 100."
+      },
+      {
+        "key": "cursorSurface",
+        "type": "enum",
+        "label": "Surface",
+        "options": [
+          "filled",
+          "faint",
+          "twotone",
+          "split",
+          "frost",
+          "bevel",
+          "keycap",
+          "metal",
+          "carbon",
+          "crt",
+          "candy",
+          "halftone",
+          "holo",
+          "comet",
+          "damask",
+          "velvet",
+          "marble",
+          "ledge",
+          "band",
+          "underglow",
+          "spiderweb",
+          "wood",
+          "terrazzo",
+          "crackle",
+          "topo",
+          "nebula",
+          "leather",
+          "stained",
+          "shadow",
+          "clear"
+        ],
+        "defaultValue": "filled",
+        "description": "Options: filled (Solid), faint, twotone (Two-tone), split, frost, bevel, keycap, metal, carbon, crt (Old screen), candy, halftone, holo (Hologram), comet, damask, velvet, marble, ledge, band, underglow, spiderweb, wood, terrazzo, crackle, topo (Contours), nebula, leather, stained (Stained glass), shadow (Only a shadow), clear."
+      },
+      {
+        "key": "cursorFill",
+        "type": "enum",
+        "label": "Fill",
+        "options": [
+          "solid",
+          "gradient",
+          "glass"
+        ],
+        "defaultValue": "solid",
+        "description": "Options: solid, gradient, glass."
+      },
+      {
+        "key": "cursorGradientTo",
+        "type": "enum",
+        "label": "Gradient into",
+        "options": [
+          "second",
+          "lighter",
+          "darker",
+          "accent",
+          "palette",
+          "border"
+        ],
+        "defaultValue": "second",
+        "description": "Options: second (Second color), lighter, darker, accent, palette (Next theme color), border (Window border)."
+      },
+      {
+        "key": "cursorGradientDir",
+        "type": "enum",
+        "label": "Gradient runs",
+        "options": [
+          "along",
+          "across",
+          "diagonal",
+          "theme"
+        ],
+        "defaultValue": "along",
+        "description": "Options: along (Tip to tail), across, diagonal, theme (Like the window border)."
+      },
+      {
+        "key": "cursorPattern",
+        "type": "enum",
+        "label": "Texture",
+        "options": [
+          "none",
+          "stripes",
+          "dots",
+          "grid"
+        ],
+        "defaultValue": "none",
+        "description": "Options: none, stripes, dots, grid."
+      },
+      {
+        "key": "cursorDepth",
+        "type": "enum",
+        "label": "Depth",
+        "options": [
+          "flat",
+          "raised",
+          "sunken"
+        ],
+        "defaultValue": "flat",
+        "description": "Options: flat, raised, sunken."
+      },
+      {
+        "key": "cursorOpacity",
+        "type": "integer",
+        "label": "Opacity",
+        "min": 30,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 100,
+        "description": "How solid the cursor is. Lower lets what is under it show through."
+      },
+      {
+        "key": "cursorTint",
+        "type": "integer",
+        "label": "Accent tint",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "defaultValue": 0,
+        "description": "How much of the theme's accent washes over the cursor's color."
+      },
+      {
+        "key": "cursorColor",
+        "type": "enum",
+        "label": "Color",
+        "options": [
+          "accent",
+          "foreground",
+          "background",
+          "border",
+          "border2",
+          "custom",
+          "white",
+          "black"
+        ],
+        "defaultValue": "foreground",
+        "description": "Theme colors follow your Omarchy theme; the cursor is made again when it changes. Options: accent (Theme accent), foreground (Theme text), background (Theme background), border (Window border), border2 (Border, second), custom, white, black."
+      },
+      {
+        "key": "cursorColorCustom",
+        "type": "string",
+        "label": "Custom color",
+        "defaultValue": "#7aa2f7",
+        "description": "A hex color like #7aa2f7."
+      },
+      {
+        "key": "cursorColor2",
+        "type": "enum",
+        "label": "Second color",
+        "options": [
+          "accent",
+          "foreground",
+          "background",
+          "border",
+          "border2",
+          "custom",
+          "white",
+          "black"
+        ],
+        "defaultValue": "accent",
+        "description": "For two-tone and split surfaces, stripes and chips, ornaments, the tip dot and the badges on help, copy and link. Options: accent (Theme accent), foreground (Theme text), background (Theme background), border (Window border), border2 (Border, second), custom, white, black."
+      },
+      {
+        "key": "cursorColor2Custom",
+        "type": "string",
+        "label": "Second custom color",
+        "defaultValue": "#f7768e",
+        "description": "A hex color like #7aa2f7."
+      },
+      {
+        "key": "cursorLine",
+        "type": "enum",
+        "label": "Lines",
+        "options": [
+          "none",
+          "solid",
+          "double",
+          "triple",
+          "glow",
+          "neon",
+          "dashed",
+          "dotted",
+          "dashdot",
+          "stitched",
+          "inset",
+          "mat",
+          "rail",
+          "wavy",
+          "sawtooth",
+          "rope",
+          "chain",
+          "beads",
+          "ladder",
+          "sketch",
+          "gilded",
+          "glitch"
+        ],
+        "defaultValue": "solid",
+        "description": "Options: none, solid, double, triple, glow (Glow ring), neon (Neon tube), dashed, dotted, dashdot (Dash and dot), stitched, inset (Inset line), mat, rail, wavy, sawtooth, rope, chain, beads, ladder, sketch (Sketched), gilded (Gilded frame), glitch."
+      },
+      {
+        "key": "cursorLineColor",
+        "type": "enum",
+        "label": "Line color",
+        "options": [
+          "auto",
+          "subtle",
+          "accent",
+          "foreground",
+          "background",
+          "border",
+          "border2",
+          "custom",
+          "white",
+          "black"
+        ],
+        "defaultValue": "auto",
+        "description": "Automatic picks dark or light, whichever stands out from the cursor's color. Subtle is a soft version of it. Options: auto (Automatic), subtle, accent (Theme accent), foreground (Theme text), background (Theme background), border (Window border), border2 (Border, second), custom, white, black."
+      },
+      {
+        "key": "cursorLineCustom",
+        "type": "string",
+        "label": "Custom line color",
+        "defaultValue": "#101010",
+        "description": "A hex color like #7aa2f7."
+      },
+      {
+        "key": "cursorLineWidth",
+        "type": "integer",
+        "label": "Line width",
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "defaultValue": 2,
+        "description": "Line width."
+      },
+      {
+        "key": "cursorLineGradient",
+        "type": "boolean",
+        "label": "Gradient lines",
+        "defaultValue": false,
+        "description": "The line fades from its color into another."
+      },
+      {
+        "key": "cursorLineFadeTo",
+        "type": "enum",
+        "label": "Fade into",
+        "options": [
+          "lighter",
+          "second",
+          "accent",
+          "palette",
+          "border"
+        ],
+        "defaultValue": "lighter",
+        "description": "Options: lighter, second (Second color), accent, palette (Next theme color), border (Window border)."
+      },
+      {
+        "key": "cursorLineFadeDir",
+        "type": "enum",
+        "label": "Fade direction",
+        "options": [
+          "along",
+          "diagonal",
+          "across",
+          "theme"
+        ],
+        "defaultValue": "along",
+        "description": "Options: along (Tip to tail), diagonal, across, theme (Like the window border)."
+      },
+      {
+        "key": "cursorOrnament",
+        "type": "enum",
+        "label": "Ornaments",
+        "options": [
+          "none",
+          "studs",
+          "rivets",
+          "pearls",
+          "crosses",
+          "stars",
+          "brackets",
+          "rosettes",
+          "diamonds",
+          "fleurons",
+          "filigree",
+          "flourish",
+          "scrolls",
+          "chevrons",
+          "fans",
+          "deco",
+          "crown",
+          "laurels"
+        ],
+        "defaultValue": "none",
+        "description": "Options: none, studs, rivets, pearls, crosses, stars, brackets, rosettes, diamonds, fleurons, filigree, flourish, scrolls, chevrons, fans, deco, crown, laurels."
+      },
+      {
+        "key": "cursorOrnamentSize",
+        "type": "integer",
+        "label": "Ornament size",
+        "min": 3,
+        "max": 16,
+        "step": 1,
+        "defaultValue": 7,
+        "description": "Ornament size."
+      },
+      {
+        "key": "cursorOrnamentsOn",
+        "type": "enum",
+        "label": "Ornaments on",
+        "options": [
+          "arrow",
+          "all"
+        ],
+        "defaultValue": "arrow",
+        "description": "The arrow also covers the cursors built on it: help, copy, link, the menu and busy in the background. Options: arrow (The arrow), all (Every cursor)."
+      },
+      {
+        "key": "cursorCap",
+        "type": "enum",
+        "label": "Accent cap",
+        "options": [
+          "none",
+          "tip",
+          "tail",
+          "both"
+        ],
+        "defaultValue": "none",
+        "description": "A dot of the theme's accent on the arrow's ends. Options: none, tip (At the tip), tail (At the tail), both (Both ends)."
+      },
+      {
+        "key": "cursorDetail",
+        "type": "enum",
+        "label": "Detail",
+        "options": [
+          "none",
+          "tip",
+          "spine",
+          "spark"
+        ],
+        "defaultValue": "none",
+        "description": "Options: none, tip, spine, spark."
+      },
+      {
+        "key": "cursorShadow",
+        "type": "enum",
+        "label": "Shadow",
+        "options": [
+          "none",
+          "soft",
+          "strong",
+          "hard",
+          "long"
+        ],
+        "defaultValue": "soft",
+        "description": "Options: none, soft, strong, hard, long."
+      },
+      {
+        "key": "cursorShadowColor",
+        "type": "enum",
+        "label": "Shadow color",
+        "options": [
+          "dark",
+          "accent"
+        ],
+        "defaultValue": "dark",
+        "description": "Options: dark, accent (Accent glow)."
+      },
+      {
+        "key": "cursorShadowDir",
+        "type": "enum",
+        "label": "Shadow falls",
+        "options": [
+          "below",
+          "around"
+        ],
+        "defaultValue": "below",
+        "description": "Options: below, around (All around)."
+      },
+      {
+        "key": "cursorShadowStrength",
+        "type": "integer",
+        "label": "Shadow strength",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 60,
+        "description": "Shadow strength."
+      },
+      {
+        "key": "cursorHand",
+        "type": "enum",
+        "label": "Over links",
+        "options": [
+          "hand",
+          "arrow",
+          "ring"
+        ],
+        "defaultValue": "hand",
+        "description": "Options: hand, arrow (Arrow and dot), ring."
+      },
+      {
+        "key": "cursorBeam",
+        "type": "enum",
+        "label": "Over text",
+        "options": [
+          "beam",
+          "slim",
+          "caret"
+        ],
+        "defaultValue": "beam",
+        "description": "Options: beam, slim, caret."
+      },
+      {
+        "key": "cursorBusy",
+        "type": "enum",
+        "label": "Busy",
+        "options": [
+          "ring",
+          "dots",
+          "orbit"
+        ],
+        "defaultValue": "ring",
+        "description": "Options: ring, dots, orbit."
+      },
+      {
+        "key": "cursorBusySpeed",
+        "type": "enum",
+        "label": "Busy speed",
+        "options": [
+          "slow",
+          "normal",
+          "fast"
+        ],
+        "defaultValue": "normal",
+        "description": "Options: slow, normal, fast."
+      },
+      {
+        "key": "hideAfter",
+        "type": "enum",
+        "label": "Hide when idle",
+        "options": [
+          "keep",
+          "0",
+          "2",
+          "5",
+          "10",
+          "30"
+        ],
+        "defaultValue": "keep",
+        "description": "Hide the pointer after it rests this long. Options: keep (As Omarchy sets it), 0 (Never), 2 (2 s), 5 (5 s), 10 (10 s), 30 (30 s)."
+      },
+      {
+        "key": "hideTyping",
+        "type": "enum",
+        "label": "Hide while typing",
+        "options": [
+          "keep",
+          "on",
+          "off"
+        ],
+        "defaultValue": "keep",
+        "description": "Options: keep (As Omarchy sets it), on, off."
+      },
+      {
+        "key": "shake",
+        "type": "boolean",
+        "label": "Shake to find",
+        "defaultValue": true,
+        "description": "Shake the mouse left and right and rings rush out of the pointer."
+      },
+      {
+        "key": "shakeSensitivity",
+        "type": "integer",
+        "label": "Sensitivity",
+        "min": 1,
+        "max": 10,
+        "step": 1,
+        "defaultValue": 5,
+        "description": "Low needs a big shake, high a little wiggle."
+      },
+      {
+        "key": "findSize",
+        "type": "integer",
+        "label": "Size",
+        "min": 30,
+        "max": 160,
+        "step": 5,
+        "defaultValue": 60,
+        "description": "Size."
+      },
+      {
+        "key": "enabled",
+        "type": "boolean",
+        "label": "Effects",
+        "defaultValue": true,
+        "description": "The trail, the halo and the find rings. The bar button turns them on and off too."
+      },
+      {
+        "key": "fullscreen",
+        "type": "enum",
+        "label": "Over fullscreen windows",
+        "options": [
+          "hide",
+          "show"
+        ],
+        "defaultValue": "hide",
+        "description": "Games and videos in fullscreen stay clean unless you say otherwise. Options: hide, show."
+      },
+      {
+        "key": "fps",
+        "type": "enum",
+        "label": "Smoothness",
+        "options": [
+          "30",
+          "60"
+        ],
+        "defaultValue": "60",
+        "description": "60 is smoother, 30 is lighter. Nothing is drawn while the pointer rests. Options: 30 (30 frames), 60 (60 frames)."
+      },
+      {
+        "key": "wheelLooks",
+        "type": "boolean",
+        "label": "Scroll for looks",
+        "defaultValue": true,
+        "description": "Scroll on the bar button to go through the ready made looks."
+      },
+      {
+        "key": "startLook",
+        "type": "enum",
+        "label": "Look at login",
+        "options": [
+          "keep",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "defaultValue": "keep",
+        "description": "Start every session with one of your saved places. Options: keep (As I left it), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12."
+      }
+    ]
+  }
+}
