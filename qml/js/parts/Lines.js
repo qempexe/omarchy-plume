@@ -40,6 +40,26 @@ var list = [
           L.over('<g filter="url(#' + L.k.blur(1.1) + ')">' + L.outside(L.band(0, L.w + 1.4, L.paint)) + '</g>');
           L.ring(0, L.w, L.paint);
           L.ring(L.w * 0.3, L.w * 0.72, L.light(L.c, 0.75));
+      } },
+    { key: "dashed", label: "Dashed", about: "Dashes all the way round.", traced: true, draw: (L) => dashed(L, "1.8 1.1") },
+    { key: "dotted", label: "Dotted", about: "Dots all the way round.", traced: true, draw: (L) => dashed(L, "0.01 " + f(L.w + 0.8), true) },
+    { key: "dashdot", label: "Dash and dot", about: "A dash, then a dot.", traced: true, draw: (L) => dashed(L, "1.8 " + f(L.w * 0.5 + 0.7) + " 0.01 " + f(L.w * 0.5 + 0.7), true) },
+    { key: "stitched", label: "Stitched", about: "Sewn like leather, just inside the edge.", traced: true,
+      draw: (L) => {
+          L.ring(0, Math.min(0.5, L.w * 0.5), L.paint);
+          for (const p of L.paths(-0.95)) L.over(L.inside(L.stroke(p, L.light(L.c, 0.55), 0.3, ' stroke-dasharray="0.9 0.7"')));
+      } },
+    { key: "inset", label: "Inset line", about: "A line a little way inside.", traced: true, reach: () => 0,
+      draw: (L) => { for (const p of L.paths(-0.75 - L.w * 0.35)) L.over(L.inside(L.stroke(p, L.paint, L.w * 0.7))); } },
+    { key: "mat", label: "Mat", about: "A light band inside, like a picture behind glass.", reach: (w) => w * 0.5,
+      draw: (L) => { L.ring(-1.3, 0, L.light(L.c, 0.75)); L.ring(0, L.w * 0.5, L.paint); } },
+    { key: "rail", label: "Rail", about: "A heavy line on the lower right side only.", reach: (w) => w * 1.5,
+      draw: (L) => {
+          L.ring(0, Math.min(0.4, L.w * 0.35), L.paint);
+          const id = L.k.id("m");
+          L.k.def('<mask id="' + id + '" maskUnits="userSpaceOnUse" x="-4" y="-4" width="40" height="40"><path d="M' + f(L.cx + 30) + " " + f(L.cy - 30)
+              + " L" + f(L.cx - 30) + " " + f(L.cy + 30) + " L" + f(L.cx + 30) + " " + f(L.cy + 30) + ' Z" fill="#fff"/></mask>');
+          L.over('<g mask="url(#' + id + ')">' + L.outside(L.band(0, L.w * 1.5, L.paint)) + '</g>');
       } }
 ];
 
