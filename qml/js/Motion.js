@@ -34,9 +34,11 @@ function add(st, x, y, now) {
         const dx = isNaN(st.x) ? 0 : x - st.x, dy = isNaN(st.y) ? 0 : y - st.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const prev = st.pts.length ? st.pts[0] : null;
-        const dt = prev ? Math.max(1, now - prev.time) : 16;
-        // px per second, eased so one jumpy sample doesn't flash the speed colors
-        st.speed = st.speed * 0.6 + (dist / dt * 1000) * 0.4;
+        // two answers can land within a millisecond; count at least a frame between them
+        const dt = prev ? Math.max(8, now - prev.time) : 16;
+        // px per second, eased so one jumpy sample doesn't flash the speed colors, and
+        // capped so a jump between screens doesn't count as flying
+        st.speed = Math.min(8000, st.speed * 0.6 + (dist / dt * 1000) * 0.4);
         st.moved += dist;
         st.lastMove = now;
         noteTurn(st, dx, now);

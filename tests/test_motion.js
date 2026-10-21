@@ -27,6 +27,11 @@ assert.strictEqual(st.pts.length, 0, "older than the trail lasts: forgotten");
 for (let i = 0; i < 400; i++) M.add(st, i, 0, 4000 + i);
 assert.ok(st.pts.length <= 160, "the path is capped");
 
+const jump = M.fresh();
+M.add(jump, 0, 0, 9000);
+M.add(jump, 3800, 0, 9000.5);
+assert.ok(jump.speed <= 8000, "a jump between screens in the same millisecond is not 'flying' at " + jump.speed);
+
 // shaking: left-right runs of 60 px, every 60 ms
 const sh = M.fresh();
 let x = 500, t = 10000, shook = false;
