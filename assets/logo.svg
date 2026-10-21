@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 40 432 432" width="424" height="424">
+  <title>Plume</title>
+  <defs>
+    <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect width="512" height="512" fill="#fff"/>
+      <g fill="none" stroke="#000" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="268.0,150.0 268.0,278.0 302.0,248.0 326.0,300.0 350.0,290.0 326.0,240.0 368.0,240.0" stroke-width="18"/>
+        <path d="M246,200 C200,226 170,276 162,340" stroke-width="22"/>
+        <path d="M232,262 C206,284 196,318 198,352" stroke-width="16"/>
+        <path d="M222,318 C214,334 214,350 220,366" stroke-width="11"/>
+      </g>
+    </mask>
+  </defs>
+  <g fill="none" stroke="#EADBC8" stroke-width="14" stroke-linecap="round">
+    <path d="M447.7,325.8 A204,204 0 0 1 64.3,325.8"/>
+    <path d="M64.3,186.2 A204,204 0 0 1 447.7,186.2"/>
+  </g>
+  <circle cx="256" cy="256" r="172" fill="#EADBC8" mask="url(#cut)"/>
+</svg>
