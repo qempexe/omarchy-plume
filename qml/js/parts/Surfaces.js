@@ -76,6 +76,68 @@ var list = [
           const p = S.k.pat(1, 1.1, '<rect width="1" height=".45" fill="#000" opacity=".38"/>', 0);
           const v = S.k.rad(S.cx, S.cy, Math.max(S.w, S.h) * 0.7, [[0.5, "#000", 0], [1, "#000", 0.4]]);
           return S.fill() + S.clip(S.rect("url(#" + p + ")") + S.rect("url(#" + v + ")"));
+      } },
+    { key: "candy", label: "Candy", about: "Wide stripes, glossy like a sweet.",
+      paint: (S) => {
+          const p = S.k.pat(3.2, 3.2, '<rect width="1.6" height="3.2" fill="' + S.c2 + '"/>', 45);
+          return S.fill() + S.clip(S.rect("url(#" + p + ")")) + gloss(S, 0.4);
+      } },
+    { key: "halftone", label: "Halftone", about: "Dots that grow toward the tail.",
+      paint: (S) => {
+          let dots = "";
+          const ax = S.tail[0] - S.tip[0], ay = S.tail[1] - S.tip[1], len2 = ax * ax + ay * ay || 1;
+          for (let y = S.box[1]; y <= S.box[3] + 1; y += 1.4)
+              for (let x = S.box[0] + ((y / 1.4) % 2 ? 0.7 : 0); x <= S.box[2] + 1; x += 1.4) {
+                  const t = Math.max(0, Math.min(1, ((x - S.tip[0]) * ax + (y - S.tip[1]) * ay) / len2));
+                  dots += circle(x, y, 0.1 + 0.55 * t, S.c2);
+              }
+          return S.fill() + S.clip(dots);
+      } },
+    { key: "holo", label: "Hologram", about: "A rainbow sheen.",
+      paint: (S) => {
+          const g = S.k.lin(S.box[0], S.box[1], S.box[2], S.box[3], [[0, "#ff5f9e", 0.6], [0.2, "#ffd36b", 0.6], [0.4, "#7dffb0", 0.6],
+                                                                     [0.6, "#6bd5ff", 0.6], [0.8, "#a78bff", 0.6], [1, "#ff5f9e", 0.6]]);
+          return S.fill() + S.clip(S.rect("url(#" + g + ")")) + gloss(S, 0.35);
+      } },
+    { key: "comet", label: "Comet", about: "Fades in from nothing at the tail.", open: true,
+      paint: (S) => {
+          const g = S.k.lin(S.tail[0], S.tail[1], S.tip[0], S.tip[1], [[0, S.c1, 0], [0.75, S.c1, 1], [1, S.light(S.c1, 0.3), 1]]);
+          return S.sil("url(#" + g + ")", 0);
+      } },
+    { key: "damask", label: "Damask", about: "An old wallpaper pattern.",
+      paint: (S) => {
+          const m = '<path d="M1.6 .2 Q2.3 1 1.6 1.6 Q.9 1 1.6 .2 M.2 1.6 Q1 2.3 1.6 1.6 Q1 .9 .2 1.6 M3 1.6 Q2.2 2.3 1.6 1.6 Q2.2 .9 3 1.6 M1.6 3 Q.9 2.2 1.6 1.6 Q2.3 2.2 1.6 3" fill="'
+              + S.c2 + '" opacity=".55"/>';
+          return S.fill() + S.clip(S.rect("url(#" + S.k.pat(3.2, 3.2, m, 0) + ")"));
+      } },
+    { key: "velvet", label: "Velvet", about: "Deep, with a soft sheen.",
+      paint: (S) => {
+          const g = S.k.rad(S.cx - S.w * 0.15, S.cy - S.h * 0.15, Math.max(S.w, S.h) * 0.8, [[0, S.light(S.c1, 0.2)], [0.5, S.c1], [1, S.dark(S.c1, 0.5)]]);
+          const s = S.k.lin(S.box[0], S.box[1], S.box[2], S.box[3], [[0.3, "#fff", 0], [0.42, "#fff", 0.16], [0.54, "#fff", 0]]);
+          return S.sil("url(#" + g + ")", 0) + S.clip(S.rect("url(#" + s + ")"));
+      } },
+    { key: "marble", label: "Marble", about: "Pale stone with winding veins.",
+      paint: (S) => {
+          let veins = "";
+          for (let v = 0; v < 4; v++) {
+              const pts = [];
+              let x = S.box[0] + S.rnd() * S.w * 0.3, y = S.box[1] + S.rnd() * S.h;
+              for (let i = 0; i < 7; i++) { pts.push([x, y]); x += S.w * 0.18; y += (S.rnd() - 0.5) * S.h * 0.3; }
+              veins += line(pts, v % 2 ? S.dark(S.c2, 0.2) : S.c2, v % 2 ? 0.18 : 0.35, ' opacity=".7"');
+          }
+          return S.sil(S.light(S.c1, 0.4), 0) + S.clip(veins);
+      } },
+    { key: "ledge", label: "Ledge", about: "A thick darker strip along the bottom.",
+      paint: (S) => S.fill() + S.clip('<rect x="-4" y="' + f(S.box[3] - S.h * 0.3) + '" width="40" height="40" fill="' + S.dark(S.c1, 0.35) + '"/>') },
+    { key: "band", label: "Band", about: "A soft stripe of the second color through the middle.",
+      paint: (S) => {
+          const g = S.k.lin(S.box[0], S.box[3], S.box[2], S.box[1], [[0.3, S.c2, 0], [0.5, S.c2, 0.85], [0.7, S.c2, 0]]);
+          return S.fill() + S.clip(S.rect("url(#" + g + ")"));
+      } },
+    { key: "underglow", label: "Underglow", about: "Light in the second color spills out underneath.",
+      paint: (S) => {
+          S.under('<g opacity=".95" filter="url(#' + S.k.blur(1.4) + ')" transform="translate(0 1.2)">' + S.sil(S.c2, 0.6) + '</g>');
+          return S.fill();
       } }
 ];
 
