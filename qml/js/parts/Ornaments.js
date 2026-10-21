@@ -59,7 +59,79 @@ var list = [
           return '<g transform="translate(' + f(x) + " " + f(y) + ") rotate(" + f(a + 90) + ')"><path d="M0 ' + f(-r) + " Q" + f(r) + " " + f(-r * 0.2) + " 0 " + f(r)
               + " Q" + f(-r) + " " + f(-r * 0.2) + " 0 " + f(-r) + ' Z" fill="' + O.c + '"/><path d="M0 ' + f(-r * 0.6) + " V" + f(r * 0.6)
               + '" stroke="' + O.dark(O.c, 0.4) + '" stroke-width=".16"/></g>';
-      }).join("") }
+      }).join("") },
+    { key: "filigree", label: "Filigree", about: "A fine frame inside, with rosettes and diamonds.",
+      draw: (O) => {
+          let out = O.inner ? O.inside(O.stroke(O.inner, O.c, 0.2, ' opacity=".85"')) : "";
+          for (const p of O.corners) out += circle(p[0], p[1], 0.3 * O.s, O.c);
+          for (const sd of O.sides) { const x = sd.x - sd.nx * 1.3, y = sd.y - sd.ny * 1.3, r = 0.45 * O.s; out += shape([[x, y - r], [x + r, y], [x, y + r], [x - r, y]], O.c); }
+          return out;
+      } },
+    { key: "flourish", label: "Flourish", about: "A swirl from the middle of the cursor.",
+      draw: (O) => {
+          const pts = [];
+          for (let i = 0; i <= 40; i++) { const t = i / 40, a = t * Math.PI * 3, r = 0.2 + t * 2.6 * O.s; pts.push([O.cx + Math.cos(a) * r, O.cy + Math.sin(a) * r]); }
+          return O.inside(path("M" + pts.map((p) => f(p[0]) + " " + f(p[1])).join(" L"), O.c, 0.3));
+      } },
+    { key: "scrolls", label: "Scrolls", about: "Scrolls curl at the tail.",
+      draw: (O) => {
+          let out = "";
+          const px = -O.axis[1], py = O.axis[0];
+          for (const side of [-1, 1]) {
+              const pts = [];
+              for (let i = 0; i <= 30; i++) {
+                  const t = i / 30, a = side * t * Math.PI * 2.2, r = (1.4 - t * 1.1) * O.s;
+                  const cx = O.tail[0] - O.axis[0] * 1.6 + px * side * 1.3, cy = O.tail[1] - O.axis[1] * 1.6 + py * side * 1.3;
+                  pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+              }
+              out += path("M" + pts.map((p) => f(p[0]) + " " + f(p[1])).join(" L"), O.c, 0.32);
+          }
+          return out;
+      } },
+    { key: "chevrons", label: "Chevrons", about: "Chevrons point out of the tip and the tail.",
+      draw: (O) => {
+          const chev = (p, dx, dy) => {
+              const r = 0.9 * O.s, px = -dy, py = dx, x = p[0] + dx * 1.6, y = p[1] + dy * 1.6;
+              return path("M" + f(x - dx * r + px * r) + " " + f(y - dy * r + py * r) + " L" + f(x) + " " + f(y) + " L" + f(x - dx * r - px * r) + " " + f(y - dy * r - py * r), O.c, 0.4);
+          };
+          return chev(O.tip, -O.axis[0], -O.axis[1]) + chev(O.tail, O.axis[0], O.axis[1]);
+      } },
+    { key: "fans", label: "Fans", about: "Little fans open in the corners.",
+      draw: (O) => O.corners.map((p) => {
+          let out = "";
+          const a0 = Math.atan2(O.cy - p[1], O.cx - p[0]), r = 1.3 * O.s;
+          for (let i = -2; i <= 2; i++) { const a = a0 + i * 0.32; out += path("M" + f(p[0]) + " " + f(p[1]) + " L" + f(p[0] + Math.cos(a) * r) + " " + f(p[1] + Math.sin(a) * r), O.c, 0.22); }
+          return O.inside(out);
+      }).join("") },
+    { key: "deco", label: "Deco", about: "Three stepped lines into each corner, the way the twenties did it.",
+      draw: (O) => {
+          const b = O.box;
+          let out = "";
+          for (let k = 0; k < 3; k++) {
+              const g = 0.5 + k * 0.6, l = (1.2 + k * 0.7) * O.s;
+              out += path("M" + f(b[0] - g) + " " + f(b[1] - g + l) + " V" + f(b[1] - g) + " H" + f(b[0] - g + l), O.c, 0.22)
+                   + path("M" + f(b[2] + g) + " " + f(b[3] + g - l) + " V" + f(b[3] + g) + " H" + f(b[2] + g - l), O.c, 0.22);
+          }
+          return out;
+      } },
+    { key: "crown", label: "Crown", about: "A little crown inside, near the tail.",
+      draw: (O) => {
+          const r = 1.1 * O.s, x = O.tail[0] - O.axis[0] * 3.6, y = O.tail[1] - O.axis[1] * 3.6;
+          const pts = [[x - r, y + r * 0.6], [x - r, y - r * 0.2], [x - r * 0.5, y + r * 0.2], [x, y - r * 0.7], [x + r * 0.5, y + r * 0.2], [x + r, y - r * 0.2], [x + r, y + r * 0.6]];
+          return shape(pts, O.c, edge(O)) + circle(x, y - r * 0.9, 0.2 * O.s, O.light(O.c, 0.5));
+      } },
+    { key: "laurels", label: "Laurels", about: "Two half wreaths hold the cursor.",
+      draw: (O) => {
+          let out = "";
+          const R = Math.max(O.box[2] - O.box[0], O.box[3] - O.box[1]) * 0.62;
+          for (const side of [-1, 1]) for (let i = 0; i < 6; i++) {
+              const a = Math.PI / 2 + side * (0.5 + i * 0.36), x = O.cx + Math.cos(a) * R, y = O.cy + Math.sin(a) * R;
+              const ang = a * 180 / Math.PI + (side > 0 ? 60 : 120), r = 0.75 * O.s;
+              out += '<ellipse cx="' + f(x) + '" cy="' + f(y) + '" rx="' + f(r) + '" ry="' + f(r * 0.38) + '" transform="rotate(' + f(ang) + " " + f(x) + " " + f(y)
+                  + ')" fill="' + O.c + '"/>';
+          }
+          return out;
+      } }
 ];
 
 var byKey = {};
