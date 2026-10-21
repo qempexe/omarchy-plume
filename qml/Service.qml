@@ -276,6 +276,9 @@ Item {
             onRead: data => {
                 if (root.answerBuf.length + data.length <= 256) root.answerBuf += data
                 else root.answerBuf = "!"
+                // The whole answer is in: hang up before Hyprland does. Left to Hyprland,
+                // every request ends in a "peer closed" warning in the shell's log.
+                if (/\}\s*$/.test(root.answerBuf) || root.answerBuf === "!") hypr.connected = false
             }
         }
         onConnectedChanged: {
@@ -286,7 +289,12 @@ Item {
                 root.takeAnswer()
             }
         }
-        onError: { root.asking = false; root.failures++ }
+        // Hyprland closing the connection after its answer is how every request ends
+        onError: function(error) {
+            if (root.asking && root.answerBuf !== "") { root.takeAnswer(); return }
+            root.asking = false
+            root.failures++
+        }
     }
 
     // Each tick asks where the pointer is and advances the effects. While the pointer
