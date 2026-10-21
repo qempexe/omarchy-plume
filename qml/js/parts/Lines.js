@@ -60,6 +60,82 @@ var list = [
           L.k.def('<mask id="' + id + '" maskUnits="userSpaceOnUse" x="-4" y="-4" width="40" height="40"><path d="M' + f(L.cx + 30) + " " + f(L.cy - 30)
               + " L" + f(L.cx - 30) + " " + f(L.cy + 30) + " L" + f(L.cx + 30) + " " + f(L.cy + 30) + ' Z" fill="#fff"/></mask>');
           L.over('<g mask="url(#' + id + ')">' + L.outside(L.band(0, L.w * 1.5, L.paint)) + '</g>');
+      } },
+    { key: "wavy", label: "Wavy", about: "Waves all the way round.", traced: true, reach: (w) => w + 0.5,
+      draw: (L) => { for (const p of L.paths(L.w / 2 + 0.2)) L.over(L.outside(L.stroke(L.displaced(p, 0.25, (s) => 0.42 * Math.sin(s * 2.6)), L.paint, L.w * 0.75))); } },
+    { key: "sawtooth", label: "Sawtooth", about: "Zigzags all the way round.", traced: true, reach: (w) => w + 0.5,
+      draw: (L) => {
+          for (const p of L.paths(L.w / 2 + 0.2))
+              L.over(L.outside(L.stroke(L.displaced(p, 0.2, (s) => 0.5 * (2 * Math.abs((s / 1.5) % 1 - 0.5) * 2 - 1)), L.paint, L.w * 0.7)));
+      } },
+    { key: "rope", label: "Rope", about: "Twists like rope.", traced: true, reach: (w) => w + 0.3,
+      draw: (L) => {
+          L.ring(0, L.w + 0.3, L.dark(L.c, 0.3));
+          for (const p of L.paths((L.w + 0.3) / 2)) {
+              let twists = "";
+              for (const q of L.walk(p, 0.8)) {
+                  const a = Math.atan2(q.ty, q.tx) + 0.9, h = (L.w + 0.3) * 0.62;
+                  twists += '<path d="M' + f(q.x - Math.cos(a) * h) + " " + f(q.y - Math.sin(a) * h) + " L" + f(q.x + Math.cos(a) * h) + " " + f(q.y + Math.sin(a) * h)
+                      + '" stroke="' + L.light(L.c, 0.4) + '" stroke-width=".28" stroke-linecap="round"/>';
+              }
+              L.over(L.outside(twists));
+          }
+      } },
+    { key: "chain", label: "Chain", about: "Links all the way round, one flat and one on its side.", traced: true, reach: (w) => w + 0.4,
+      draw: (L) => {
+          for (const p of L.paths(L.w / 2 + 0.2)) {
+              let links = "", n = 0;
+              for (const q of L.walk(p, 1.15)) {
+                  const a = Math.atan2(q.ty, q.tx) * 180 / Math.PI, flat = n++ % 2 === 0;
+                  links += '<ellipse cx="' + f(q.x) + '" cy="' + f(q.y) + '" rx="' + f(flat ? 0.75 : 0.5) + '" ry="' + f(flat ? 0.38 : 0.12)
+                      + '" transform="rotate(' + f(a) + " " + f(q.x) + " " + f(q.y) + ')" fill="none" stroke="' + L.c + '" stroke-width=".26"/>';
+              }
+              L.over(L.outside(links));
+          }
+      } },
+    { key: "beads", label: "Beads", about: "Beads strung round the edge.", traced: true, reach: (w) => w + 0.3,
+      draw: (L) => {
+          const r = Math.max(0.35, L.w * 0.5 + 0.1);
+          for (const p of L.paths(r)) {
+              let beads = "";
+              for (const q of L.walk(p, r * 2.2))
+                  beads += circle(q.x, q.y, r, L.c) + circle(q.x - r * 0.3, q.y - r * 0.3, r * 0.35, "#fff", ' opacity=".55"');
+              L.over(L.outside(beads));
+          }
+      } },
+    { key: "ladder", label: "Ladder", about: "Rungs between two lines.", traced: true, reach: (w) => w + 0.8,
+      draw: (L) => {
+          const W = L.w + 0.8;
+          L.ring(0, 0.28, L.paint);
+          L.ring(W - 0.28, W, L.paint);
+          for (const p of L.paths(W / 2)) {
+              let rungs = "";
+              for (const q of L.walk(p, 0.85))
+                  rungs += '<path d="M' + f(q.x - q.nx * W / 2) + " " + f(q.y - q.ny * W / 2) + " L" + f(q.x + q.nx * W / 2) + " " + f(q.y + q.ny * W / 2)
+                      + '" stroke="' + L.c + '" stroke-width=".22"/>';
+              L.over(L.outside(rungs));
+          }
+      } },
+    { key: "sketch", label: "Sketched", about: "Drawn by hand, twice over.", traced: true, reach: (w) => w + 0.4,
+      draw: (L) => {
+          for (const p of L.paths(L.w / 2)) {
+              const a = L.wobble(1.3), b = L.wobble(4.7);
+              L.over(L.outside(L.stroke(L.displaced(p, 0.3, (s) => a(s) * 0.35), L.paint, L.w * 0.55, ' opacity=".9"')
+                  + L.stroke(L.displaced(p, 0.3, (s) => b(s) * 0.4 + 0.15), L.paint, L.w * 0.4, ' opacity=".7"')));
+          }
+      } },
+    { key: "gilded", label: "Gilded frame", about: "A gold-leaf frame in your line color.", reach: (w) => w + 0.7,
+      draw: (L) => {
+          const g = L.k.lin(L.box[0], L.box[1], L.box[2], L.box[3], [[0, L.light(L.c, 0.6)], [0.3, L.c], [0.55, L.dark(L.c, 0.4)], [0.8, L.light(L.c, 0.5)], [1, L.c]]);
+          L.ring(0, L.w + 0.7, "url(#" + g + ")");
+          L.ring(0, 0.22, L.dark(L.c, 0.55));
+          L.ring(L.w + 0.48, L.w + 0.7, L.dark(L.c, 0.55));
+      } },
+    { key: "glitch", label: "Glitch", about: "Slips into cyan and magenta.", reach: (w) => w + 0.6,
+      draw: (L) => {
+          L.over('<g opacity=".8" transform="translate(-.55 .1)">' + L.outside(L.band(0, L.w, "#ff2fa0")) + '</g>');
+          L.over('<g opacity=".8" transform="translate(.55 -.1)">' + L.outside(L.band(0, L.w, "#22e6ff")) + '</g>');
+          L.ring(0, L.w * 0.6, L.paint);
       } }
 ];
 
