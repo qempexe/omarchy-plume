@@ -138,7 +138,107 @@ var list = [
       paint: (S) => {
           S.under('<g opacity=".95" filter="url(#' + S.k.blur(1.4) + ')" transform="translate(0 1.2)">' + S.sil(S.c2, 0.6) + '</g>');
           return S.fill();
-      } }
+      } },
+    { key: "spiderweb", label: "Spiderweb", about: "A web spun from the tip.",
+      paint: (S) => {
+          let web = "";
+          const R = Math.hypot(S.w, S.h);
+          const base = Math.atan2(S.tail[1] - S.tip[1], S.tail[0] - S.tip[0]);
+          const spokes = [];
+          for (let i = -2; i <= 2; i++) spokes.push(base + i * 0.32);
+          for (const a of spokes) web += line([S.tip, [S.tip[0] + Math.cos(a) * R, S.tip[1] + Math.sin(a) * R]], S.ink, 0.18, ' opacity=".45"');
+          for (let k = 1; k <= 4; k++) {
+              const r = k * R / 5;
+              web += line(spokes.map((a) => [S.tip[0] + Math.cos(a) * r, S.tip[1] + Math.sin(a) * r]), S.ink, 0.16, ' opacity=".4"');
+          }
+          return S.fill() + S.clip(web);
+      } },
+    { key: "wood", label: "Wood", about: "Grain around a knot.",
+      paint: (S) => {
+          let rings = "";
+          const kx = S.cx + S.w * 0.15, ky = S.cy + S.h * 0.1;
+          for (let k = 1; k <= 9; k++) {
+              const pts = [];
+              for (let i = 0; i <= 24; i++) {
+                  const a = 2 * Math.PI * i / 24, r = k * 0.9 * (1 + 0.12 * Math.sin(a * 3 + k));
+                  pts.push([kx + Math.cos(a) * r * 1.6, ky + Math.sin(a) * r * 0.8]);
+              }
+              rings += line(pts, S.dark(S.c1, 0.35), 0.2, ' opacity=".55"');
+          }
+          return S.fill() + S.clip(rings);
+      } },
+    { key: "terrazzo", label: "Terrazzo", about: "Chips of stone in your colors.",
+      paint: (S) => {
+          let chips = "";
+          const cols = [S.c2, S.acc, S.light(S.c1, 0.5), S.dark(S.c1, 0.4)];
+          for (let i = 0; i < 26; i++) {
+              const x = S.box[0] + S.rnd() * S.w, y = S.box[1] + S.rnd() * S.h, r = 0.35 + S.rnd() * 0.55, n = 3 + Math.floor(S.rnd() * 3);
+              const pts = [];
+              for (let j = 0; j < n; j++) { const a = 2 * Math.PI * j / n + S.rnd(); pts.push([x + Math.cos(a) * r, y + Math.sin(a) * r]); }
+              chips += poly(pts, cols[i % cols.length]);
+          }
+          return S.fill() + S.clip(chips);
+      } },
+    { key: "crackle", label: "Crackle", about: "A cracked glaze.",
+      paint: (S) => {
+          let cracks = "";
+          for (let c = 0; c < 6; c++) {
+              const pts = [];
+              let x = S.box[0] + S.rnd() * S.w, y = S.box[1] + S.rnd() * S.h, a = S.rnd() * 6.28;
+              for (let i = 0; i < 6; i++) { pts.push([x, y]); a += (S.rnd() - 0.5) * 1.4; x += Math.cos(a) * 1.6; y += Math.sin(a) * 1.6; }
+              cracks += line(pts, S.dark(S.c1, 0.55), 0.18, ' opacity=".7"');
+          }
+          return S.fill() + gloss(S, 0.2) + S.clip(cracks);
+      } },
+    { key: "topo", label: "Contours", about: "The lines of a map.",
+      paint: (S) => {
+          let lines = "";
+          for (let k = 1; k <= 7; k++) {
+              const pts = [];
+              for (let i = 0; i <= 28; i++) {
+                  const a = 2 * Math.PI * i / 28, r = k * 1.15 * (1 + 0.18 * Math.sin(a * 2 + 1.3) + 0.08 * Math.sin(a * 5));
+                  pts.push([S.cx + Math.cos(a) * r, S.cy + Math.sin(a) * r * 0.85]);
+              }
+              lines += line(pts, S.ink, 0.17, ' opacity=".42"');
+          }
+          return S.fill() + S.clip(lines);
+      } },
+    { key: "nebula", label: "Nebula", about: "Clouds and stars.",
+      paint: (S) => {
+          const cloud = (x, y, r, c, a) => { const g = S.k.rad(x, y, r, [[0, c, a], [1, c, 0]]); return circle(x, y, r, "url(#" + g + ")"); };
+          let stars = "";
+          for (let i = 0; i < 14; i++) stars += circle(S.box[0] + S.rnd() * S.w, S.box[1] + S.rnd() * S.h, 0.08 + S.rnd() * 0.16, "#fff", ' opacity="' + f(0.5 + S.rnd() * 0.5) + '"');
+          return S.sil(S.dark(S.c1, 0.6), 0) + S.clip(cloud(S.cx - S.w * 0.2, S.cy - S.h * 0.15, S.w * 0.6, S.c2, 0.8)
+              + cloud(S.cx + S.w * 0.2, S.cy + S.h * 0.2, S.w * 0.55, S.acc, 0.6) + cloud(S.cx, S.cy, S.w * 0.35, S.light(S.c1, 0.3), 0.5) + stars);
+      } },
+    { key: "leather", label: "Leather", about: "A pebbled grain.",
+      paint: (S) => {
+          let grain = "";
+          for (let i = 0; i < 70; i++)
+              grain += circle(S.box[0] + S.rnd() * S.w, S.box[1] + S.rnd() * S.h, 0.25 + S.rnd() * 0.3, i % 2 ? "#000" : "#fff", ' opacity="' + (i % 2 ? ".16" : ".1") + '"');
+          return S.fill() + S.clip(grain) + gloss(S, 0.12);
+      } },
+    { key: "stained", label: "Stained glass", about: "Panes of color held by dark lead.",
+      paint: (S) => {
+          const cols = [S.c1, S.c2, S.acc, S.light(S.c1, 0.35), S.light(S.c2, 0.3)];
+          const step = 3.4, pts = [];
+          for (let y = S.box[1] - step; y <= S.box[3] + step; y += step) {
+              const row = [];
+              for (let x = S.box[0] - step; x <= S.box[2] + step; x += step) row.push([x + (S.rnd() - 0.5) * 1.6, y + (S.rnd() - 0.5) * 1.6]);
+              pts.push(row);
+          }
+          let panes = "";
+          for (let j = 0; j < pts.length - 1; j++) for (let i = 0; i < pts[j].length - 1; i++) {
+              const a = pts[j][i], b = pts[j][i + 1], c = pts[j + 1][i + 1], dd = pts[j + 1][i];
+              const lead = ' stroke="' + S.dark(S.c1, 0.75) + '" stroke-width=".32" stroke-linejoin="round"';
+              panes += poly([a, b, c], cols[(i + j) % cols.length], lead) + poly([a, c, dd], cols[(i + j + 2) % cols.length], lead);
+          }
+          return S.fill() + S.clip(panes) + gloss(S, 0.2);
+      } },
+    { key: "shadow", label: "Only a shadow", about: "Nothing but the shadow, and the lines and ornaments.", open: true,
+      paint: (S) => "" },
+    { key: "clear", label: "Clear", about: "Nothing at all, so only the lines and ornaments are left.", open: true, noShadow: true,
+      paint: (S) => "" }
 ];
 
 var byKey = {};
