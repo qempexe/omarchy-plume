@@ -9,6 +9,7 @@ import "js/Motion.js" as Motion
 import "js/Pointer.js" as Pointer
 import "js/Ink.js" as Ink
 import "js/Cursor.js" as Cursor
+import "js/BarBridge.js" as BarBridge
 
 // Shared brain of Plume, one for the whole shell:
 //   * the settings and the saved looks
@@ -22,6 +23,7 @@ Item {
 
     property var shell: null
     property var manifest: null
+    property var barBridge: null
 
     readonly property string pluginId: "io.github.qempexe.plume"
 
@@ -106,6 +108,41 @@ Item {
     function importLook(text) {
         if (typeof text !== "string" || text.length > 8192) return false
         try { return wear(JSON.parse(text)) } catch (e) { return false }
+    }
+
+    // ---- a bar that is not the built-in one ---------------------------------------
+    // Omarchy gives a replacement bar a service-less facade, so its widget cannot
+    // hold this object. It reads one detached snapshot and calls a short list of
+    // actions instead; js/BarBridge.js carries both. The built-in bar keeps the
+    // direct service path and never polls.
+    function barSnapshot() {
+        return JSON.parse(JSON.stringify({
+            cfg: root.cfg,
+            version: root.manifest && root.manifest.version ? String(root.manifest.version) : "",
+            themePalette: root.themePalette,
+            borderColors: root.borderColors,
+            borderAngle: root.borderAngle,
+            colorCtx: root.colorCtx,
+            cursorDesign: root.cursorDesign,
+            cursorArrow: root.cursorArrow,
+            cursorHot: root.cursorHot,
+            ownCursor: root.ownCursor,
+            cursorStatus: root.cursorStatus,
+            cursorThemes: root.cursorThemes,
+            slots: root.slots,
+            canUndo: root.canUndo
+        }))
+    }
+
+    // this widget's entry in shell.json, handed over by the bar widget
+    function setShellSettings(next) {
+        if (!next || typeof next !== "object" || Array.isArray(next)) return false
+        const clean = {}
+        for (const key of Object.keys(next)) {
+            if (Schema.byKey[key]) clean[key] = Schema.cleanValue(key, next[key])
+        }
+        root.shellSettings = clean
+        return true
     }
 
     // a saved place to put on at every login
@@ -490,7 +527,33 @@ Item {
         }
     }
 
-    Component.onCompleted: scanThemes()
+    Component.onCompleted: {
+        scanThemes()
+        root.barBridge = BarBridge.publish(function() { return root.barSnapshot() }, {
+            setSetting: function(key, value) {
+                const k = String(key || "")
+                if (!Schema.byKey[k]) return undefined
+                root.setSetting(k, value)
+                return root.cfg[k]
+            },
+            setShellSettings: function(settings) { return root.setShellSettings(settings) },
+            find: function() { root.find(); return true },
+            stepLook: function(direction) {
+                const d = Number(direction)
+                return root.stepLook(isFinite(d) && d !== 0 ? (d > 0 ? 1 : -1) : 1) !== ""
+            },
+            applyLook: function(key) { return root.applyLook(String(key || "")) },
+            undoLook: function() { return root.undoLook() },
+            saveSlot: function(index) { return root.saveSlot(Math.round(Number(index))) },
+            saveNew: function() { return root.saveNew() },
+            loadSlot: function(index) { return root.loadSlot(Math.round(Number(index))) },
+            clearSlot: function(index) { root.clearSlot(Math.round(Number(index))); return true },
+            wearCursor: function(key) { return root.wearCursor(String(key || "")) },
+            resetAll: function() { root.store.resetAll(Schema.defaults()); return true }
+        })
+    }
+
+    Component.onDestruction: BarBridge.clear(root.barBridge)
 
     // ---- the effects layer ---------------------------------------------------------
     Loader {

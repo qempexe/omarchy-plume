@@ -4,6 +4,7 @@ import qs.Commons
 import qs.Ui
 import "panel"
 import "js/Schema.js" as Schema
+import "js/BarBridge.js" as BarBridge
 
 // The bar button: a pointer glyph, bright while the effects are on.
 //   left click     effects on / off
@@ -15,18 +16,103 @@ BarWidget {
 
     moduleName: "io.github.qempexe.plume"
 
-    readonly property var service: bar && bar.shell ? bar.shell.serviceFor(moduleName) : null
+    // The built-in bar hands over the live service. A replacement bar only gets a
+    // service-less facade, so fall back to the detached snapshot the service
+    // publishes through js/BarBridge.js.
+    readonly property var directService: bar && bar.shell && typeof bar.shell.serviceFor === "function"
+        ? bar.shell.serviceFor(moduleName) : null
+    property var bridgeApi: null
+    property var bridgeSnapshot: null
+    property string bridgeSnapshotText: ""
+    property string shellSettingsText: ""
+    readonly property var service: directService || (bridgeSnapshot ? bridgeService : null)
     readonly property var cfg: service ? service.cfg : Schema.resolve(root.settings, null)
     readonly property bool on: cfg.enabled === true
     readonly property color fg: bar ? bar.barForeground : Color.foreground
     readonly property string fontName: bar ? bar.fontFamily : Style.font.family
 
     // the service reads the widget's own settings from shell.json through here
-    onSettingsChanged: if (service) service.shellSettings = root.settings
-    onServiceChanged: if (service) service.shellSettings = root.settings
+    onSettingsChanged: root.pushShellSettings()
+    onDirectServiceChanged: {
+        root.shellSettingsText = ""
+        root.pushShellSettings()
+    }
 
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight
+
+    ServiceProxy {
+        id: bridgeService
+        snapshot: root.bridgeSnapshot
+        api: root.bridgeApi
+    }
+
+    // The snapshot is small and made in the shell process. Poll it only when this
+    // bar gave us no service, faster while the settings panel is open.
+    Timer {
+        interval: settingsPopup.visible ? 250 : 1000
+        running: !root.directService
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: root.syncBridge()
+    }
+
+    function syncBridge() {
+        if (root.directService) return
+        const api = BarBridge.current()
+        if (!api) {
+            root.bridgeApi = null
+            root.bridgeSnapshot = null
+            root.bridgeSnapshotText = ""
+            return
+        }
+        const next = api.snapshot()
+        if (!next) {
+            root.bridgeApi = null
+            root.bridgeSnapshot = null
+            root.bridgeSnapshotText = ""
+            return
+        }
+        const text = JSON.stringify(next)
+        if (api !== root.bridgeApi) {
+            root.bridgeApi = api
+            // a new service (hot reload) needs this widget's entry again
+            root.shellSettingsText = ""
+            root.pushShellSettings()
+        }
+        if (text !== root.bridgeSnapshotText) {
+            root.bridgeSnapshotText = text
+            root.bridgeSnapshot = next
+        }
+    }
+
+    function pushShellSettings() {
+        let next = ({})
+        try {
+            next = JSON.parse(JSON.stringify(root.settings && typeof root.settings === "object"
+                ? root.settings : ({})))
+        } catch (e) { return }
+        const text = JSON.stringify(next)
+        if (text === root.shellSettingsText) return
+        let sent = false
+        if (root.directService && typeof root.directService.setShellSettings === "function") {
+            sent = root.directService.setShellSettings(next)
+        } else if (root.bridgeApi) {
+            sent = root.bridgeApi.call("setShellSettings", [next]) === true
+        }
+        if (sent) root.shellSettingsText = text
+    }
+
+    Component.onCompleted: {
+        root.syncBridge()
+        root.pushShellSettings()
+    }
+
+    // The shell's summon/toggle path for bar-widget panels: a key binding, or
+    // `omarchy-shell shell toggle io.github.qempexe.plume`, opens the settings.
+    readonly property bool opened: settingsPopup.visible
+    function open() { settingsPopup.open() }
+    function close() { settingsPopup.close() }
 
     WidgetButton {
         id: button
@@ -37,6 +123,7 @@ BarWidget {
         tooltipText: "Plume: effects " + (root.on ? "on" : "off")
             + (root.service ? " · " + (Schema.lookNow(root.cfg) !== "" ? Schema.lookLabels[Schema.lookNow(root.cfg)] : "your own look") : "")
         onPressed: function(buttonCode) {
+            root.syncBridge()
             if (!root.service) return
             if (buttonCode === Qt.LeftButton) root.service.setSetting("enabled", !root.on)
             else if (buttonCode === Qt.RightButton) settingsPopup.toggle()
