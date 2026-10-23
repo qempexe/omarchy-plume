@@ -250,12 +250,23 @@ PopupWindow {
     }
 
     function toggle() {
+        if (root.visible) {
+            root.close()
+            return
+        }
         // A click on the widget while the panel is open first closes it as an
         // "outside click" (below); don't let the same click open it again.
-        if (!root.visible && Date.now() - root.grabClosedAt < 500) return
-        if (!root.visible) root.locate()
-        root.visible = !root.visible
+        if (Date.now() - root.grabClosedAt < 500) return
+        root.open()
     }
+
+    function open() {
+        if (root.visible) return
+        root.locate()
+        root.visible = true
+    }
+
+    function close() { root.visible = false }
 
     // ---- click outside to close -----------------------------------------------------
     // Hyprland's focus grab reports any click outside the panel. It is created at

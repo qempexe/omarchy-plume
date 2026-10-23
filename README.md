@@ -141,6 +141,7 @@ omarchy-shell io.github.qempexe.plume set trail sparks  # any setting
 omarchy-shell io.github.qempexe.plume set cursorSurface marble
 omarchy-shell io.github.qempexe.plume themes            # the cursor themes it found
 omarchy-shell io.github.qempexe.plume status            # what is on, as JSON
+omarchy-shell shell toggle io.github.qempexe.plume      # open or close the settings
 ```
 
 `exportLook` prints the current look as text and `importLook '<text>'` applies one.
@@ -154,6 +155,7 @@ To find the pointer with a key, bind `omarchy-shell io.github.qempexe.plume find
 - The cursor is changed with `hyprctl setcursor` and `hyprctl eval`, only for the settings you change, and only for this session of Hyprland; your config files are never touched.
 - The cursor made in Plume is written by the shell itself, no program runs to make it. When you stop wearing it, its folders' `manifest.hl` is moved aside to `manifest.hl.off`, so Hyprland never picks it up by itself at the next login.
 - Text fields read at most 1 KB from the clipboard, only on Ctrl+V or Shift+Insert.
+- The bar button works in the built-in bar and in replacement bars. Where the shell gives a replacement bar's widget no live service, Plume reads a detached snapshot and calls a short list of actions instead; the effects and the cursor are unchanged either way.
 
 ## Inside
 
@@ -163,7 +165,7 @@ qml/
 ├── BarWidget.qml        the bar button
 ├── overlay/             Overlay (one click-through layer per screen), Effects (the canvas)
 ├── panel/               SettingsPopup, SettingRow, LooksPage, FxArt (the tiles and preview),
-│                        CursorArt, CursorShowcase, AboutPage
+│                        CursorArt, CursorShowcase, AboutPage, ServiceProxy (a replacement bar's view)
 ├── core/                SettingsStore, Run (helper commands), CursorForge (writes the cursor theme)
 └── js/
     ├── arrows/          one file per arrow, listed in Arrows.js
@@ -179,11 +181,12 @@ qml/
     ├── Pointer.js       cursor themes and the hyprctl commands (unit-tested)
     ├── Paint.js         draws one frame; Find.js draws the find rings
     ├── Schema.js        every setting and the ready made looks
+    ├── BarBridge.js     the detached snapshot and actions a replacement bar's widget can reach
     └── Ink.js, Theme.js, Demo.js
 assets/                  the logo, light and dark
 tools/manifest.js        writes manifest.json from Schema.js
 tests/                   node tests/test_parts.js · node tests/test_cursor.js · node tests/test_motion.js
-                         python3 tests/test_manifest.py
+                         node tests/test_bridge.js · python3 tests/test_manifest.py
 ```
 
 To add an arrow, a trail, a halo or a color mode, see [CONTRIBUTING.md](CONTRIBUTING.md).

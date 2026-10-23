@@ -45,6 +45,7 @@ Add it to `looks` in `qml/js/Schema.js`. A look only sets trail, halo and color 
 node tests/test_parts.js      # every trail, halo and color mode draws clean numbers; looks and settings hold together
 node tests/test_cursor.js     # every arrow and style draws a well formed cursor; the theme and its zips hold together
 node tests/test_motion.js     # the pointer's path, shaking, and the hyprctl commands
+node tests/test_bridge.js     # the replacement-bar bridge, its allowlist and the panel surface stay in step
 python3 tests/test_manifest.py
 ```
 
