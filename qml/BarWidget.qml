@@ -4,6 +4,7 @@ import qs.Commons
 import qs.Ui
 import "panel"
 import "js/Schema.js" as Schema
+import "bridge" as PlumeBridge
 
 // The bar button: a pointer glyph, bright while the effects are on.
 //   left click     effects on / off
@@ -15,7 +16,18 @@ BarWidget {
 
     moduleName: "io.github.qempexe.plume"
 
-    readonly property var service: bar && bar.shell ? bar.shell.serviceFor(moduleName) : null
+    // Primary path: the bar host's scoped facade (service-capable under the
+    // first-party bar). Fallback: the engine-wide bridge singleton -- under
+    // replacement bars (e.g. ruixen.bar) the facade's serviceFor() is a
+    // deliberate null stub, so the button would otherwise never see the
+    // service. Re-evaluates on its own when the service publishes (or is
+    // torn down). See bridge/Bridge.qml.
+    readonly property var service: {
+        var viaHost = bar && bar.shell && typeof bar.shell.serviceFor === "function"
+            ? bar.shell.serviceFor(moduleName)
+            : null
+        return viaHost || PlumeBridge.Bridge.service
+    }
     readonly property var cfg: service ? service.cfg : Schema.resolve(root.settings, null)
     readonly property bool on: cfg.enabled === true
     readonly property color fg: bar ? bar.barForeground : Color.foreground

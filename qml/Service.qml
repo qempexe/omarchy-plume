@@ -9,6 +9,7 @@ import "js/Motion.js" as Motion
 import "js/Pointer.js" as Pointer
 import "js/Ink.js" as Ink
 import "js/Cursor.js" as Cursor
+import "bridge" as PlumeBridge
 
 // Shared brain of Plume, one for the whole shell:
 //   * the settings and the saved looks
@@ -490,7 +491,18 @@ Item {
         }
     }
 
-    Component.onCompleted: scanThemes()
+    // Publish for widgets hosted by replacement bars, whose `bar.shell`
+    // facade cannot resolve plugin services (serviceFor() is a deliberate
+    // null stub there). See bridge/Bridge.qml; the host facade stays the
+    // primary path under the stock shell.
+    Component.onCompleted: {
+        PlumeBridge.Bridge.service = root
+        scanThemes()
+    }
+
+    // Unpublish so a widget falling back to the bridge never binds to a
+    // dying instance.
+    Component.onDestruction: if (PlumeBridge.Bridge.service === root) PlumeBridge.Bridge.service = null
 
     // ---- the effects layer ---------------------------------------------------------
     Loader {
