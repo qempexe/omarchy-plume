@@ -57,7 +57,7 @@ Every cursor programs ask for is there, under all the names they use: the arrow,
 
 Plume writes the cursor as a Hyprcursor theme to `~/.local/share/icons/plume-a` (and `plume-b`; the two take turns, so Hyprland always loads a fresh one) and wears it with `hyprctl setcursor`. The pictures are SVG, so the cursor stays sharp at any size and on any screen scale. Hyprland's own `cursor:enable_hyprcursor` is turned on while you wear it and put back when you stop.
 
-Programs that only know XCursor (some X11 ones running in XWayland) keep showing the theme you had before.
+Programs that only know XCursor (GTK 3 ones such as WebKitGTK apps, and X11 ones in XWayland) get the same cursor too: a few seconds after it is worn, `tools/xcursor.py` draws it once more as XCursor into the same folder (with `rsvg-convert`, which comes with Hyprcursor, and `python3`), and Plume sets GTK's cursor theme and size to it with `gsettings`. GTK's own theme and size are remembered and put back when you stop wearing it. Without `python3` those programs keep showing the theme you had before.
 
 ## Trails
 

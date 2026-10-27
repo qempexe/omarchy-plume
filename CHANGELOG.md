@@ -4,6 +4,7 @@
 
 - **Replacement bars**: the bar button and its settings now work in a custom bar too. Where the shell gives a replacement bar's widget no live service, Plume reads a detached snapshot and calls a short allowlist of actions instead; the built-in bar keeps its direct service path.
 - The settings can also be opened from a key binding with `omarchy-shell shell toggle io.github.qempexe.plume`.
+- **XCursor copy**: the cursor made in Plume is also drawn as XCursor and worn as GTK's cursor theme, so GTK 3 programs (WebKitGTK apps such as Tauri and Electrobun ones) and X11 programs show it instead of the theme from before. GTK's own cursor theme and size are put back when the cursor is taken off. `python3 tests/test_xcursor.py` checks the drawing.
 - `node tests/test_bridge.js` checks the bridge, its allowlist, and that the snapshot and the panel's view of it stay in step.
 
 ## 1.0.0

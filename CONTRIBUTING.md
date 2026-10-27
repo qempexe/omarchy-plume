@@ -47,6 +47,7 @@ node tests/test_cursor.js     # every arrow and style draws a well formed cursor
 node tests/test_motion.js     # the pointer's path, shaking, and the hyprctl commands
 node tests/test_bridge.js     # the replacement-bar bridge, its allowlist and the panel surface stay in step
 python3 tests/test_manifest.py
+python3 tests/test_xcursor.py   # the XCursor copy: sizes, hotspot, frames and links (needs rsvg-convert)
 ```
 
 The settings panel shows every new arrow, trail, halo and color mode as a tile on its own. Keep comments and text plain: say what it does, the way the rest of the files do.

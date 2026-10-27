@@ -3,12 +3,15 @@ import Quickshell
 import Quickshell.Io
 import "../js/Cursor.js" as Cursor
 import "../js/Zip.js" as Zip
+import "../js/Pointer.js" as Pointer
 
 // Makes a design into a Hyprcursor theme Hyprland can wear, in
 // ~/.local/share/icons/plume-a (or plume-b):
 //   manifest.hl              the theme's name
 //   index.theme              for programs that only know XCursor: falls back to your theme
 //   hyprcursors/<name>.hlc   one per cursor: a zip of its meta.hl and its pictures
+//   cursors/<name>           the same cursors as XCursor, added afterwards by
+//                            tools/xcursor.py (see xcursor() below)
 // Everything is written by the shell itself, no command runs. The two folders take
 // turns, so the one being worn is never rewritten under Hyprland's feet and a new name
 // always makes it load afresh. The one not worn has its manifest.hl moved aside (to
@@ -29,6 +32,7 @@ Item {
     property string error: ""
 
     signal built(string name, string key)
+    signal xcursorMade(string name, int size)
 
     property var job: null                 // { name, key, waiting }
     property var next: null                // a build asked for while one runs
@@ -130,5 +134,32 @@ Item {
         seconds: 5
         maxOut: 1024
         onDone: function(code, out, err) { root.retireNext() }
+    }
+
+    // Draws the cursor in `name` once more as XCursor, at `size`, for the programs that
+    // only know XCursor (GTK 3 ones, X11 ones in XWayland). It takes a few seconds, so
+    // Hyprland wears the cursor first; an ask while one runs waits for it, the latest only.
+    readonly property string xcursorScript: decodeURIComponent(Qt.resolvedUrl("../../tools/xcursor.py").toString().replace(/^file:\/\//, ""))
+    property var xcJob: null                 // { name, size }
+    property var xcNext: null
+    function xcursor(name, size) {
+        if (xcRun.running) { root.xcNext = { name: name, size: size }; return }
+        const argv = Pointer.xcursorArgs(root.xcursorScript, root.iconsDir + "/" + name, size)
+        if (!argv) return
+        root.xcJob = { name: name, size: size }
+        xcRun.start(argv)
+    }
+    Run {
+        id: xcRun
+        seconds: 120
+        maxOut: 1024
+        onDone: function(code, out, err) {
+            const j = root.xcJob, n = root.xcNext
+            root.xcJob = null
+            root.xcNext = null
+            if (j && code === 0) root.xcursorMade(j.name, j.size)
+            else if (j) console.warn("Plume: the XCursor copy could not be made: " + err.slice(0, 300))
+            if (n) Qt.callLater(root.xcursor, n.name, n.size)
+        }
     }
 }
