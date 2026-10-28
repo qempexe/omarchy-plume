@@ -165,7 +165,8 @@ Item {
         const n = parseInt(cfg.startLook)
         if (n >= 1 && n <= Schema.SLOTS && slots[n - 1]) wear(slots[n - 1], true)
         applyPointer()
-        if (!ownCursor) forge.retire("")
+        // not worn, but GTK still points at it (the shell stopped before it was put back)
+        if (!ownCursor) { forge.retire(""); restoreGtk() }
         lateApply.start()
     }
 
@@ -611,7 +612,22 @@ Item {
         })
     }
 
-    Component.onDestruction: BarBridge.clear(root.barBridge)
+    Component.onDestruction: {
+        BarBridge.clear(root.barBridge)
+        putBackGtk()
+    }
+
+    // The shell stops (a restart, the plugin turned off or removed): GTK's own cursor goes
+    // back right away, so GTK programs never point at a folder that's no theme. The values
+    // stay remembered, and the next start wears the copy again once it's made.
+    function putBackGtk() {
+        const saved = pointerStore.values
+        if (!root.ownCursor || typeof saved.gtkTheme !== "string") return
+        const theme = Pointer.gtkSetArgs("cursor-theme", saved.gtkTheme)
+        const size = typeof saved.gtkSize === "number" ? Pointer.gtkSetArgs("cursor-size", saved.gtkSize) : null
+        if (theme) Quickshell.execDetached(theme)
+        if (size) Quickshell.execDetached(size)
+    }
 
     // ---- the effects layer ---------------------------------------------------------
     Loader {
