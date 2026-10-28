@@ -18,7 +18,7 @@ for (const it of S.items) {
   schema.push(d); defaults[it.key] = it.fallback;
 }
 const m = {
-  schemaVersion: 1, id: "io.github.qempexe.plume", name: "Plume", version: "1.0.0", author: "qempexe", license: "MIT",
+  schemaVersion: 1, id: "io.github.qempexe.plume", name: "Plume", version: "1.1.0", author: "qempexe", license: "MIT",
   description: "Design your own cursor (14 arrows, 30 surfaces, 22 lines, 18 ornaments, shadows, and every other cursor drawn to match) and give your pointer live effects: 6 trails, 6 halos, 8 color modes, shake to find, ready made and saved looks, from one settings panel.",
   kinds: ["service", "bar-widget"], keepLoaded: true,
   entryPoints: { service: "qml/Service.qml", barWidget: "qml/BarWidget.qml" },

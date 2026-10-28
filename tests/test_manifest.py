@@ -33,7 +33,7 @@ class PluginTests(unittest.TestCase):
             self.assertTrue(os.path.isfile(os.path.join(ROOT, rel)), rel)
 
     def test_version_has_a_changelog_entry(self):
-        self.assertIn("## " + self.m["version"] + "\n", read("CHANGELOG.md"))
+        self.assertIn("## [" + self.m["version"] + "] - ", read("CHANGELOG.md"))
 
     def test_every_text_item_is_plain_text(self):
         """Text.AutoText would render markup (and fetch <img> addresses). Every Text pins PlainText."""
