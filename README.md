@@ -206,6 +206,10 @@ rm -rf ~/.local/state/omarchy-plume                          # settings, looks, 
 rm -rf ~/.local/share/icons/plume-a ~/.local/share/icons/plume-b   # the cursor made in Plume
 ```
 
+GTK's cursor theme and size are put back when the shell stops. If they still point at
+`plume-a` or `plume-b`, `gsettings reset org.gnome.desktop.interface cursor-theme` and
+`gsettings reset org.gnome.desktop.interface cursor-size` set them back to the default.
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md).
