@@ -251,11 +251,11 @@ var tabs = [
 
 var items = [];
 var byKey = {};
-for (var ti = 0; ti < tabs.length; ti++) {
-    for (var gi = 0; gi < tabs[ti].groups.length; gi++) {
-        var grp = tabs[ti].groups[gi];
-        for (var ii = 0; ii < grp.items.length; ii++) {
-            var it = grp.items[ii];
+for (let ti = 0; ti < tabs.length; ti++) {
+    for (let gi = 0; gi < tabs[ti].groups.length; gi++) {
+        const grp = tabs[ti].groups[gi];
+        for (let ii = 0; ii < grp.items.length; ii++) {
+            const it = grp.items[ii];
             it.tab = tabs[ti].key;
             it.group = grp.title;
             items.push(it);
@@ -321,9 +321,9 @@ function active(it, values) {
 
 var lookTabs = ["trail", "halo", "colors"];
 var lookExclude = {};
-for (var pk = 0; pk < items.length; pk++) if (/^panel/.test(items[pk].key)) lookExclude[items[pk].key] = true;
+for (let pk = 0; pk < items.length; pk++) if (/^panel/.test(items[pk].key)) lookExclude[items[pk].key] = true;
 var lookKeys = [];
-for (var lk = 0; lk < items.length; lk++)
+for (let lk = 0; lk < items.length; lk++)
     if (lookTabs.indexOf(items[lk].tab) >= 0 && !lookExclude[items[lk].key]) lookKeys.push(items[lk].key);
 
 var looks = [
@@ -345,7 +345,7 @@ var looks = [
 var lookByKey = {};
 var lookOptions = [];
 var lookLabels = {};
-for (var li = 0; li < looks.length; li++) {
+for (let li = 0; li < looks.length; li++) {
     lookByKey[looks[li].key] = looks[li];
     lookOptions.push(looks[li].key);
     lookLabels[looks[li].key] = looks[li].label;
@@ -387,7 +387,7 @@ function cleanLook(raw) {
 // hiding are left alone.
 
 var cursorKeys = [];
-for (var ck = 0; ck < items.length; ck++)
+for (let ck = 0; ck < items.length; ck++)
     if (items[ck].tab === "cursor" && /^cursor/.test(items[ck].key)) cursorKeys.push(items[ck].key);
 
 var cursorLooks = [
@@ -426,7 +426,7 @@ var cursorLooks = [
                                               cursorLineColor: "accent", cursorOrnament: "stars", cursorOrnamentSize: 5 } }
 ];
 var cursorLookByKey = {};
-for (var cl = 0; cl < cursorLooks.length; cl++) cursorLookByKey[cursorLooks[cl].key] = cursorLooks[cl];
+for (let cl = 0; cl < cursorLooks.length; cl++) cursorLookByKey[cursorLooks[cl].key] = cursorLooks[cl];
 
 // every cursor key of a ready made cursor, with it put on
 function cursorLookSet(key) {

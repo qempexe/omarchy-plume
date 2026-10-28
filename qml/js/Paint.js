@@ -29,8 +29,8 @@ function frame(ctx, s) {
         for (const k in s.mem) delete s.mem[k];
         s.mem.trailKey = trail.key;
     }
-    const tg = { ctx: ctx, pts: s.pts, size: cfg.trailSize, strength: cfg.trailStrength / 100, life: cfg.trailLife / 100,
-                 dt: s.dt, moved: s.moved, mem: s.mem, time: s.time, color: color, busy: false };
+    const tg = { ctx, pts: s.pts, size: cfg.trailSize, strength: cfg.trailStrength / 100, life: cfg.trailLife / 100,
+                 dt: s.dt, moved: s.moved, mem: s.mem, time: s.time, color, busy: false };
     ctx.save();
     try { trail.draw(tg); } catch (e) { }
     ctx.restore();
@@ -40,15 +40,15 @@ function frame(ctx, s) {
         const halo = Halos.byKey[cfg.halo] || Halos.byKey.none;
         const a = haloAlpha(cfg.haloShow, s.still);
         if (a > 0.01 && halo.key !== "none") {
-            const hg = { ctx: ctx, x: s.x, y: s.y, w: s.w, h: s.h, size: cfg.haloSize, strength: a * cfg.haloStrength / 100,
-                         time: s.time, color: color, busy: false };
+            const hg = { ctx, x: s.x, y: s.y, w: s.w, h: s.h, size: cfg.haloSize, strength: a * cfg.haloStrength / 100,
+                         time: s.time, color, busy: false };
             ctx.save();
             try { halo.draw(hg); } catch (e) { }
             ctx.restore();
             busy = busy || hg.busy;
         }
         if (cfg.haloShow !== "always" && a > 0.01 && a < 0.99) busy = true;
-        const fg = { ctx: ctx, x: s.x, y: s.y, size: cfg.findSize, color: color };
+        const fg = { ctx, x: s.x, y: s.y, size: cfg.findSize, color };
         ctx.save();
         if (Find.draw(fg, s.findAge)) busy = true;
         ctx.restore();

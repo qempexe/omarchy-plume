@@ -99,7 +99,7 @@ function walk(poly, step) {
         while (along + len < target && i < poly.length * 2) { along += len; i++; [a, b, len] = seg(i); }
         const t = len > 0 ? (target - along) / len : 0;
         const tx = len > 0 ? (b[0] - a[0]) / len : 1, ty = len > 0 ? (b[1] - a[1]) / len : 0;
-        out.push({ x: a[0] + (b[0] - a[0]) * t, y: a[1] + (b[1] - a[1]) * t, tx: tx, ty: ty, nx: sgn * ty, ny: -sgn * tx, s: target });
+        out.push({ x: a[0] + (b[0] - a[0]) * t, y: a[1] + (b[1] - a[1]) * t, tx, ty, nx: sgn * ty, ny: -sgn * tx, s: target });
     }
     return out;
 }

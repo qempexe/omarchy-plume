@@ -30,7 +30,7 @@ var byKey = {};
 var keys = [];
 var labels = {};
 var abouts = {};
-for (var i = 0; i < list.length; i++) {
+for (let i = 0; i < list.length; i++) {
     byKey[list[i].key] = list[i];
     keys.push(list[i].key);
     labels[list[i].key] = list[i].label;

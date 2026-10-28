@@ -60,7 +60,7 @@ function arrow(key) {
     const tip = pts[0];
     const e1 = norm([pts[1][0] - tip[0], pts[1][1] - tip[1]]);
     const e2 = norm([pts[pts.length - 1][0] - tip[0], pts[pts.length - 1][1] - tip[1]]);
-    return { hot: tip, tip: tip, inward: norm([e1[0] + e2[0], e1[1] + e2[1]]),
+    return { hot: tip, tip, inward: norm([e1[0] + e2[0], e1[1] + e2[1]]),
              layers: [{ pieces: [{ t: "poly", p: pts }], box: boxOf(pts) }] };
 }
 
@@ -69,7 +69,7 @@ var BADGE = [24.2, 24.2];
 function badged(key, marks) {
     const g = arrow(key);
     g.layers.push({ badge: true, pieces: [{ t: "circle", cx: BADGE[0], cy: BADGE[1], r: 5.4 }],
-                    box: [18.8, 18.8, 29.6, 29.6], marks: marks });
+                    box: [18.8, 18.8, 29.6, 29.6], marks });
     return g;
 }
 function badgeMark(kind) {
@@ -107,10 +107,10 @@ function spinner(style, cx, cy, r, f, frames, w) {
     }
     if (style === "orbit") {
         const p = (a, k) => ({ t: "circle", cx: cx + r * Math.cos(a), cy: cy + r * Math.sin(a), r: r * k });
-        return [{ t: "circle", cx: cx, cy: cy, r: r * 0.22, op: 0.55 }, p(turn, 0.3), p(turn + Math.PI, 0.22)];
+        return [{ t: "circle", cx, cy, r: r * 0.22, op: 0.55 }, p(turn, 0.3), p(turn + Math.PI, 0.22)];
     }
-    return [{ t: "stroke", w: w, d: circlePath(cx, cy, r), op: 0.3 },
-            { t: "stroke", w: w, d: arcPath(cx, cy, r, turn, turn + Math.PI * 0.6) }];
+    return [{ t: "stroke", w, d: circlePath(cx, cy, r), op: 0.3 },
+            { t: "stroke", w, d: arcPath(cx, cy, r, turn, turn + Math.PI * 0.6) }];
 }
 
 // ---- hands ------------------------------------------------------------------------------------
@@ -118,8 +118,8 @@ function spinner(style, cx, cy, r, f, frames, w) {
 var handKeys = ["hand", "arrow", "ring"];
 var handLabels = { hand: "Hand", arrow: "Arrow and dot", ring: "Ring" };
 
-function rect(x, y, w, h, r, rot) { return { t: "rect", x: x, y: y, w: w, h: h, r: r, rot: rot || 0 }; }
-function line(d, w, op) { return { t: "stroke", d: d, w: w, op: op }; }
+function rect(x, y, w, h, r, rot) { return { t: "rect", x, y, w, h, r, rot: rot || 0 }; }
+function line(d, w, op) { return { t: "stroke", d, w, op }; }
 
 function pointing(style, arrowKey) {
     if (style === "arrow") {
@@ -161,7 +161,7 @@ function beam(style, rot) {
     else
         pieces = [line("M16 7.8 V24.2", 1.7), line("M12.8 6.6 Q16 6.6 16 8.4 Q16 6.6 19.2 6.6", 1.5),
                   line("M12.8 25.4 Q16 25.4 16 23.6 Q16 25.4 19.2 25.4", 1.5)];
-    return { hot: [C, C], rot: rot || 0, layers: [{ pieces: pieces, box: [12, 6, 20, 26] }] };
+    return { hot: [C, C], rot: rot || 0, layers: [{ pieces, box: [12, 6, 20, 26] }] };
 }
 
 // ---- signs ------------------------------------------------------------------------------------
@@ -181,23 +181,23 @@ function move() {
     const head = [[16, 3.8], [20.4, 9], [11.6, 9]];
     const pieces = [line("M16 8.5 V23.5 M8.5 16 H23.5", 2.2)];
     for (const a of [0, 90, 180, 270]) pieces.push({ t: "poly", p: head.map((p) => rotate(p, a, C, C)) });
-    return { hot: [C, C], layers: [{ pieces: pieces, box: [3.8, 3.8, 28.2, 28.2] }] };
+    return { hot: [C, C], layers: [{ pieces, box: [3.8, 3.8, 28.2, 28.2] }] };
 }
 function doubleArrow(rot) {
-    return { hot: [C, C], rot: rot, layers: [{ box: [10, 3.8, 22, 28.2], pieces: [{ t: "poly", p: [[16, 3.8], [21.6, 10], [18.1, 10], [18.1, 22],
+    return { hot: [C, C], rot, layers: [{ box: [10, 3.8, 22, 28.2], pieces: [{ t: "poly", p: [[16, 3.8], [21.6, 10], [18.1, 10], [18.1, 22],
         [21.6, 22], [16, 28.2], [10.4, 22], [13.9, 22], [13.9, 10], [10.4, 10]] }] }] };
 }
 function splitArrow(rot) {
-    return { hot: [C, C], rot: rot, layers: [{ box: [3.8, 6, 28.2, 26], pieces: [rect(15, 6, 2, 20, 0.6),
+    return { hot: [C, C], rot, layers: [{ box: [3.8, 6, 28.2, 26], pieces: [rect(15, 6, 2, 20, 0.6),
         { t: "poly", p: [[3.8, 16], [9.6, 10.6], [9.6, 13.9], [13.2, 13.9], [13.2, 18.1], [9.6, 18.1], [9.6, 21.4]] },
         { t: "poly", p: [[28.2, 16], [22.4, 10.6], [22.4, 13.9], [18.8, 13.9], [18.8, 18.1], [22.4, 18.1], [22.4, 21.4]] }] }] };
 }
 var UP = [[16, 8.6], [21.6, 14.6], [18.1, 14.6], [18.1, 27.4], [13.9, 27.4], [13.9, 14.6], [10.4, 14.6]];
 function sideArrow(rot) {
-    return { hot: [C, C], rot: rot, layers: [{ box: [8, 4, 24, 27.5], pieces: [rect(8, 4.2, 16, 2.3, 0.7), { t: "poly", p: UP }] }] };
+    return { hot: [C, C], rot, layers: [{ box: [8, 4, 24, 27.5], pieces: [rect(8, 4.2, 16, 2.3, 0.7), { t: "poly", p: UP }] }] };
 }
 function cornerArrow(rot) {
-    return { hot: [C, C], rot: rot, layers: [{ box: [4.5, 4.5, 25, 25], pieces: [rect(4.5, 4.5, 13, 2.3, 0.7), rect(4.5, 4.5, 2.3, 13, 0.7),
+    return { hot: [C, C], rot, layers: [{ box: [4.5, 4.5, 25, 25], pieces: [rect(4.5, 4.5, 13, 2.3, 0.7), rect(4.5, 4.5, 2.3, 13, 0.7),
         { t: "poly", p: UP.map((p) => rotate([p[0], p[1] + 0.6], -45, C, C)) }] }] };
 }
 function zoom(plus) {
@@ -247,4 +247,4 @@ var shapes = [
     { dir: "zoom-out", names: [], make: () => zoom(false) }
 ];
 var shapeByDir = {};
-for (var si = 0; si < shapes.length; si++) shapeByDir[shapes[si].dir] = shapes[si];
+for (let si = 0; si < shapes.length; si++) shapeByDir[shapes[si].dir] = shapes[si];

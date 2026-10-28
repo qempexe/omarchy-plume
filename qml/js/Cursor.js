@@ -129,7 +129,7 @@ function design(cfg, theme) {
         depth: cfg.cursorDepth,
         opacity: Math.max(0.3, Math.min(1, (cfg.cursorOpacity || 100) / 100)),
         c1: toHex(c1), c2: toHex(c2), acc: toHex(acc),
-        line: line, lineColor: toHex(lineColor), lineWidth: widths[Math.max(1, Math.min(4, cfg.cursorLineWidth || 2)) - 1],
+        line, lineColor: toHex(lineColor), lineWidth: widths[Math.max(1, Math.min(4, cfg.cursorLineWidth || 2)) - 1],
         lineFade: cfg.cursorLineGradient === true,
         lineFadeTo: toHex(cfg.cursorLineFadeTo === "lighter" ? mixRgb(lineColor, [255, 255, 255], 0.55) : toward(cfg.cursorLineFadeTo, lineColor, c2, theme)),
         lineFadeDir: cfg.cursorLineFadeDir,
@@ -286,8 +286,8 @@ function render(glyph, d) {
         let lower = "";
         const rnd = Geo.rng(seedOf(glyph, li));
         const S = {
-            k: k, c1: d.c1, c2: d.c2, acc: d.acc, ink: d.ink, light: light, dark: dark, mix: mix,
-            box: b, cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2, w: b[2] - b[0], h: b[3] - b[1], tip: tip, tail: tail, rnd: rnd,
+            k, c1: d.c1, c2: d.c2, acc: d.acc, ink: d.ink, light, dark, mix,
+            box: b, cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2, w: b[2] - b[0], h: b[3] - b[1], tip, tail, rnd,
             sil: (paint, grow) => sil(paint, grow || 0),
             fill: () => d.fill === "glass"
                 ? '<g opacity=".45">' + sil(base, 0) + '</g>'
@@ -317,9 +317,9 @@ function render(glyph, d) {
         // the line
         let lineUnder = "", lineOver = "";
         const Lc = {
-            k: k, c: d.lineColor, w: d.lineWidth, box: b, cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2, light: light, dark: dark,
+            k, c: d.lineColor, w: d.lineWidth, box: b, cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2, light, dark,
             paint: d.lineColor,
-            band: band, outside: outside, inside: inside,
+            band, outside, inside,
             ring: (from, to, paint) => {
                 // a line from the edge out goes under a solid fill, so no seam shows
                 if (from <= 0 && !open) lineUnder += from < 0 ? band(from, to, paint) : sil(paint, to);
@@ -397,13 +397,13 @@ function ornament(glyph, d, k) {
         const edges = [];
         for (let i = 0; i < pg.length; i++) {
             const a = pg[i], c = pg[(i + 1) % pg.length], len = Math.hypot(c[0] - a[0], c[1] - a[1]);
-            edges.push({ a: a, c: c, len: len });
+            edges.push({ a, c, len });
         }
         edges.sort((x, y) => y.len - x.len);
         const sgn = Geo.area(pg) > 0 ? 1 : -1;
         sides = edges.slice(0, 2).map((e) => {
             const tx = (e.c[0] - e.a[0]) / (e.len || 1), ty = (e.c[1] - e.a[1]) / (e.len || 1);
-            return { x: (e.a[0] + e.c[0]) / 2, y: (e.a[1] + e.c[1]) / 2, tx: tx, ty: ty, nx: sgn * ty, ny: -sgn * tx };
+            return { x: (e.a[0] + e.c[0]) / 2, y: (e.a[1] + e.c[1]) / 2, tx, ty, nx: sgn * ty, ny: -sgn * tx };
         });
     } else {
         corners = [[b[2], b[1]], [b[2], b[3]], [b[0], b[3]]];
@@ -411,8 +411,8 @@ function ornament(glyph, d, k) {
     }
     const sil = (paint, grow) => silhouette(layer.pieces, paint, d.round + grow);
     const O = {
-        corners: corners, sides: sides, tip: tip, tail: tail, axis: [ax / al, ay / al], box: b, cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2,
-        s: d.ornamentSize, c: d.c2, c2: d.lineColor, light: light, dark: dark,
+        corners, sides, tip, tail, axis: [ax / al, ay / al], box: b, cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2,
+        s: d.ornamentSize, c: d.c2, c2: d.lineColor, light, dark,
         inner: pg ? Geo.offset(pg, d.round - 1.1) : null,
         stroke: (poly, paint, w, extra) => '<path d="' + polyD(poly) + '" fill="none" stroke="' + paint + '" stroke-width="' + f(w) + '" stroke-linejoin="round"' + (extra || "") + '/>',
         inside: (inner) => k.mask(sil("#fff", 0), inner)
@@ -505,7 +505,7 @@ function theme(d, name, inherits) {
             meta += "define_size = 0, " + S.dir + ".svg\n";
         }
         files.unshift({ name: "meta.hl", text: meta });
-        out.shapes.push({ dir: S.dir, files: files });
+        out.shapes.push({ dir: S.dir, files });
     }
     return out;
 }

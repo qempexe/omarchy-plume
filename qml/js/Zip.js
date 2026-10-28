@@ -4,7 +4,7 @@
 // its meta.hl and its pictures. The files are stored as they are, without compression;
 // they are small SVG text. Gives an ArrayBuffer, which FileView.setData() writes.
 
-var CRC = (function() {
+var CRC = (() => {
     const t = [];
     for (let n = 0; n < 256; n++) {
         let c = n;

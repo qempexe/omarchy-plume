@@ -42,7 +42,7 @@ function add(st, x, y, now) {
         st.moved += dist;
         st.lastMove = now;
         noteTurn(st, dx, now);
-        st.pts.unshift({ x: x, y: y, time: now });
+        st.pts.unshift({ x, y, time: now });
         if (st.pts.length > MAX_POINTS) st.pts.length = MAX_POINTS;
     } else {
         st.speed *= 0.7;

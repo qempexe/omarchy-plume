@@ -8,22 +8,22 @@
 // The built-in bar keeps its direct service object. Nothing here exposes the
 // service: the widget can only read JSON-safe data and call the actions named
 // in the allowlist.
-var active = null
+var active = null;
 
 function publish(readSnapshot, actions) {
-    var allowed = actions || ({})
-    var api = Object.freeze({
-        snapshot: function() {
+    const allowed = actions || ({});
+    const api = Object.freeze({
+        snapshot() {
             return active === api ? readSnapshot() : null
         },
-        call: function(name, args) {
+        call(name, args) {
             if (active !== api) return undefined
-            var key = String(name || "")
+            const key = String(name || "");
             if (!Object.prototype.hasOwnProperty.call(allowed, key)) return undefined
             if (typeof allowed[key] !== "function") return undefined
             return allowed[key].apply(null, Array.isArray(args) ? args : [])
         }
-    })
+    });
     active = api
     return api
 }

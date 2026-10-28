@@ -36,7 +36,7 @@ function draw(ctx, v, colors, w, h, phase, k, mem, time, bare) {
         trailSize: Math.max(1.5, v.trailSize * k), haloSize: Math.max(8, v.haloSize * k), findSize: Math.max(8, v.findSize * k)
     });
     const pts = path(w, h, phase);
-    const s = { cfg: cfg, pts: pts, x: pts[0].x, y: pts[0].y, here: true, w: w, h: h, colors: colors,
+    const s = { cfg, pts, x: pts[0].x, y: pts[0].y, here: true, w, h, colors,
                 time: time || 2.4, dt: 1 / 30, moved: 9, speed: 0.55,
                 // a halo that waits for the pointer to rest is shown as it looks then
                 still: v.haloShow === "still" ? 2 : 0, findAge: 99, mem: mem || {} };
