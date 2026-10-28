@@ -51,3 +51,9 @@ python3 tests/test_xcursor.py   # the XCursor copy: sizes, hotspot, frames and l
 ```
 
 The settings panel shows every new arrow, trail, halo and color mode as a tile on its own. Keep comments and text plain: say what it does, the way the rest of the files do.
+
+## Code style
+
+ES6 JavaScript: `const` and `let`, arrow functions for callbacks and method shorthand. The names a `.pragma library` file shares at its top level stay `var` (and `function`), because that is how the other files and the tests see them. Helper commands are argument arrays, never a shell, and the ones whose output is read run through `core/Run.qml` with a time and an output limit; `python3 tests/test_manifest.py` checks it.
+
+Everyone taking part is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
