@@ -12,7 +12,7 @@ import "../js/Pointer.js" as Pointer
 //   hyprcursors/<name>.hlc   one per cursor: a zip of its meta.hl and its pictures
 //   cursors/<name>           the same cursors as XCursor, added afterwards by
 //                            tools/xcursor.py (see xcursor() below)
-// Everything is written by the shell itself, no command runs. The two folders take
+// Everything but cursors/ is written by the shell itself, no command runs. The two folders take
 // turns, so the one being worn is never rewritten under Hyprland's feet and a new name
 // always makes it load afresh. The one not worn has its manifest.hl moved aside (to
 // manifest.hl.off), so it is no theme and Hyprland never picks it by itself. Nothing is
