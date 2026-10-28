@@ -76,14 +76,14 @@ Item {
     function same(a, b) { return str(a) === str(b) }
     function labelFor(opt) { return labels[opt] !== undefined ? labels[opt] : String(opt) }
     function show(v) {
-        var n = Number(v) / divisor
+        const n = Number(v) / divisor
         if (!isFinite(n)) return "?"
         return String(parseFloat(n.toFixed(decimals)))
     }
     function clamp01(t) { return Math.max(0, Math.min(1, t)) }
     function nudge(dir) {
-        var cur = Number(value)
-        var v = Math.max(min, Math.min(max, cur + dir * step))
+        const cur = Number(value)
+        const v = Math.max(min, Math.min(max, cur + dir * step))
         if (v !== cur) edited(v)
     }
 
@@ -93,7 +93,7 @@ Item {
     // Owner calls this with the capped text. Single line only, inserted at the cursor.
     function insertPasted(target, raw) {
         if (!target) return
-        var t = String(raw === null || raw === undefined ? "" : raw).split(/\r?\n/)[0]
+        const t = String(raw === null || raw === undefined ? "" : raw).split(/\r?\n/)[0]
         target.insert(target.cursorPosition, t)
     }
 
@@ -604,9 +604,9 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     function apply(mx) {
-                        var room = Math.max(1, slider.width - slider.knob)
-                        var t = Math.max(0, Math.min(1, (mx - slider.knob / 2) / room))
-                        var v = root.min + t * (root.max - root.min)
+                        const room = Math.max(1, slider.width - slider.knob)
+                        const t = Math.max(0, Math.min(1, (mx - slider.knob / 2) / room))
+                        let v = root.min + t * (root.max - root.min)
                         v = Math.round((v - root.min) / root.step) * root.step + root.min
                         v = Math.max(root.min, Math.min(root.max, v))
                         // only report real changes, so dragging doesn't spam the config

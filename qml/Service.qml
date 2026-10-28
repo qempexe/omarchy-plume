@@ -588,27 +588,27 @@ Item {
 
     Component.onCompleted: {
         scanThemes()
-        root.barBridge = BarBridge.publish(function() { return root.barSnapshot() }, {
-            setSetting: function(key, value) {
+        root.barBridge = BarBridge.publish(() => root.barSnapshot(), {
+            setSetting(key, value) {
                 const k = String(key || "")
                 if (!Schema.byKey[k]) return undefined
                 root.setSetting(k, value)
                 return root.cfg[k]
             },
-            setShellSettings: function(settings) { return root.setShellSettings(settings) },
-            find: function() { root.find(); return true },
-            stepLook: function(direction) {
+            setShellSettings(settings) { return root.setShellSettings(settings) },
+            find() { root.find(); return true },
+            stepLook(direction) {
                 const d = Number(direction)
                 return root.stepLook(isFinite(d) && d !== 0 ? (d > 0 ? 1 : -1) : 1) !== ""
             },
-            applyLook: function(key) { return root.applyLook(String(key || "")) },
-            undoLook: function() { return root.undoLook() },
-            saveSlot: function(index) { return root.saveSlot(Math.round(Number(index))) },
-            saveNew: function() { return root.saveNew() },
-            loadSlot: function(index) { return root.loadSlot(Math.round(Number(index))) },
-            clearSlot: function(index) { root.clearSlot(Math.round(Number(index))); return true },
-            wearCursor: function(key) { return root.wearCursor(String(key || "")) },
-            resetAll: function() { root.store.resetAll(Schema.defaults()); return true }
+            applyLook(key) { return root.applyLook(String(key || "")) },
+            undoLook() { return root.undoLook() },
+            saveSlot(index) { return root.saveSlot(Math.round(Number(index))) },
+            saveNew() { return root.saveNew() },
+            loadSlot(index) { return root.loadSlot(Math.round(Number(index))) },
+            clearSlot(index) { root.clearSlot(Math.round(Number(index))); return true },
+            wearCursor(key) { return root.wearCursor(String(key || "")) },
+            resetAll() { root.store.resetAll(Schema.defaults()); return true }
         })
     }
 

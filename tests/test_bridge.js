@@ -67,7 +67,7 @@ const widget = read("BarWidget.qml");
     const actions = service.slice(service.indexOf("BarBridge.publish"))
     assert.ok(actions.length > 0, "Service.qml publishes the bridge")
     for (const match of proxy.matchAll(/call\("([A-Za-z_][A-Za-z0-9_]*)"/g))
-        assert.ok(actions.includes(match[1] + ": function"), "the service allows " + match[1])
+        assert.ok(new RegExp("\\b" + match[1] + "\\(").test(actions), "the service allows " + match[1])
 }
 
 // ---- the widget uses the bridge only as a fallback --------------------------

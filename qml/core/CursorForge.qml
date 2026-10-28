@@ -40,7 +40,7 @@ Item {
 
     function build(design, key, inherits) {
         if (root.home.indexOf("/") !== 0) { root.error = "No home folder to keep the cursor in."; return }
-        if (root.busy) { root.next = { design: design, key: key, inherits: inherits }; return }
+        if (root.busy) { root.next = { design, key, inherits }; return }
         const name = (root.builtName || root.worn) === "plume-a" ? "plume-b" : "plume-a"
         const theme = Cursor.theme(design, name, inherits)
         if (!theme) return
@@ -49,7 +49,7 @@ Item {
         for (const s of theme.shapes) files.push({ path: out + "/hyprcursors/" + s.dir + ".hlc", data: Zip.zip(s.files) })
 
         root.busy = true
-        root.job = { name: name, key: key, waiting: files.length }
+        root.job = { name, key, waiting: files.length }
         dropWriters()
         watchdog.restart()
         for (const f of files) {
@@ -59,7 +59,7 @@ Item {
             fv.path = f.path
             root.writers.push(fv)
             fv.saved.connect(root.wrote)
-            fv.saveFailed.connect(function() { root.fail("Could not write the cursor to ~/.local/share/icons.") })
+            fv.saveFailed.connect(() => { root.fail("Could not write the cursor to ~/.local/share/icons.") })
             if (f.data !== undefined) fv.setData(f.data)
             else fv.setText(f.text)
         }

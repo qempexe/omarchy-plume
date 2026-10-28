@@ -43,19 +43,19 @@ PopupWindow {
     // Missing names just return undefined, so an unknown theme falls back to the
     // bar foreground instead of breaking.
     function themeColor(names) {
-        for (var i = 0; i < names.length; i++) {
-            var raw
+        for (let i = 0; i < names.length; i++) {
+            let raw
             try { raw = Color[names[i]] } catch (e) { raw = undefined }
             if (raw === undefined || raw === null) continue
             try {
-                var c = Qt.color(raw)
+                const c = Qt.color(raw)
                 if (c && c.valid !== false) return c
             } catch (e2) { }
         }
         return null
     }
     function hexColor(text) {
-        var t = String(text)
+        const t = String(text)
         return /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(t) ? Qt.color(t) : null
     }
     function luma(c) { return 0.299 * c.r + 0.587 * c.g + 0.114 * c.b }
@@ -164,7 +164,7 @@ PopupWindow {
     readonly property real padRight: (vertical && !barAtLeft) ? gap + extra : 0
 
     function sideFromText(v) {
-        var t = String(v === undefined || v === null ? "" : v).toLowerCase()
+        const t = String(v === undefined || v === null ? "" : v).toLowerCase()
         if (t.indexOf("top") >= 0) return "top"
         if (t.indexOf("bottom") >= 0) return "bottom"
         if (t.indexOf("left") >= 0) return "left"
@@ -173,20 +173,20 @@ PopupWindow {
     }
 
     function locate() {
-        var item = root.anchorItem
+        const item = root.anchorItem
         if (!item) return
-        var scr = item.screen
-        var sw = scr ? scr.width : 1920
-        var sh = scr ? scr.height : 1080
-        var side = ""
-        var qsWin = null
-        var win = null
+        const scr = item.screen
+        const sw = scr ? scr.width : 1920
+        const sh = scr ? scr.height : 1080
+        let side = ""
+        let qsWin = null
+        let win = null
 
         // 1. the bar window knows which edges it is attached to
         try { qsWin = item.QsWindow.window } catch (e0) { qsWin = null }
         try { win = qsWin ? qsWin : item.Window.window } catch (e1) { win = null }
         try {
-            var an = win ? win.anchors : null
+            const an = win ? win.anchors : null
             if (an) {
                 if (root.vertical) {
                     if (an.left && !an.right) side = "left"
@@ -200,9 +200,9 @@ PopupWindow {
 
         // 2. the shell's bar object may say it outright
         if (side === "" && root.barObject) {
-            var names = ["position", "barPosition", "edge", "side", "location", "placement", "barSide"]
-            for (var i = 0; i < names.length && side === ""; i++) {
-                var got = ""
+            const names = ["position", "barPosition", "edge", "side", "location", "placement", "barSide"]
+            for (let i = 0; i < names.length && side === ""; i++) {
+                let got = ""
                 try { got = root.sideFromText(root.barObject[names[i]]) } catch (e3) { got = "" }
                 if ((root.vertical && (got === "left" || got === "right"))
                         || (!root.vertical && (got === "top" || got === "bottom")))
@@ -212,7 +212,7 @@ PopupWindow {
 
         // 3. last resort: which half of the screen (only meaningful when the bar
         //    window is as big as the screen)
-        var pos = item.mapToItem(null, 0, 0)
+        const pos = item.mapToItem(null, 0, 0)
         if (side === "") {
             if (root.vertical) side = pos.x < sw / 2 ? "left" : "right"
             else side = pos.y < sh / 2 ? "top" : "bottom"
@@ -221,9 +221,9 @@ PopupWindow {
         root.barAtLeft = side === "left"
 
         // Anchor rectangle on the bar window's outer edge (window coordinates).
-        var ww = (win && win.width > 0) ? win.width : 0
-        var wh = (win && win.height > 0) ? win.height : 0
-        var small = root.vertical ? (ww > 0 && ww < sw * 0.5) : (wh > 0 && wh < sh * 0.5)
+        const ww = (win && win.width > 0) ? win.width : 0
+        const wh = (win && win.height > 0) ? win.height : 0
+        const small = root.vertical ? (ww > 0 && ww < sw * 0.5) : (wh > 0 && wh < sh * 0.5)
         root.useRect = !!qsWin && small
         root.anchorWin = qsWin
         if (root.useRect) {
@@ -244,8 +244,8 @@ PopupWindow {
         }
 
         // Tallest the panel may be and still fit between the bar and the far edge.
-        var thick = (!root.vertical && wh > 0 && wh < sh * 0.5) ? wh : 40
-        var room = root.vertical ? sh - 40 : sh - thick - root.gap - root.extra - 16
+        const thick = (!root.vertical && wh > 0 && wh < sh * 0.5) ? wh : 40
+        const room = root.vertical ? sh - 40 : sh - thick - root.gap - root.extra - 16
         root.maxHeight = Math.max(300, Math.min(680, room))
     }
 
@@ -278,10 +278,10 @@ PopupWindow {
 
     Component.onCompleted: {
         try {
-            var g = Qt.createQmlObject(
+            const g = Qt.createQmlObject(
                 'import Quickshell.Hyprland\nHyprlandFocusGrab { }', root, "PlumeFocusGrab")
             g.windows = [root]
-            g.cleared.connect(function() {
+            g.cleared.connect(() => {
                 // A grab that ends right after opening was taken before the panel was
                 // on screen: take it again instead of closing what was just opened.
                 if (root.visible && Date.now() - root.openedAt < 700 && root.grabTries < 4) {
@@ -374,8 +374,8 @@ PopupWindow {
     }
 
     function finishPaste(raw) {
-        var row = pasteRow
-        var target = pasteTarget
+        const row = pasteRow
+        const target = pasteTarget
         pasteRow = null
         pasteTarget = null
         if (!row || !target) return
