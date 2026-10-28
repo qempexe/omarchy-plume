@@ -91,3 +91,45 @@ function baseTheme(env, remembered) {
     if (ok(remembered)) return remembered;
     return "default";
 }
+
+// The XCursor copy of the cursor made in Plume: tools/xcursor.py, run on one of its own
+// folders, for programs that only know XCursor.
+function xcursorArgs(script, dir, size) {
+    const n = Math.round(Number(size));
+    const name = String(dir || "").replace(/\/+$/, "").split("/").pop();
+    if (typeof script !== "string" || script.indexOf("/") !== 0 || !/\/tools\/xcursor\.py$/.test(script)) return null;
+    if (typeof dir !== "string" || dir.indexOf("/") !== 0 || dir.indexOf("/../") >= 0 || !OWN_RE.test(name)) return null;
+    if (!(n >= 8 && n <= 256)) return null;
+    return ["python3", "-I", script, dir, String(n)];
+}
+
+// GTK's cursor theme and size, which GTK 3 programs read instead of asking Hyprland.
+// Only these two keys, and only a theme name or a size, ever reach gsettings.
+var GTK_KEYS = { "cursor-theme": true, "cursor-size": true };
+
+function gtkGetArgs(key) {
+    if (!GTK_KEYS[key]) return null;
+    return ["gsettings", "get", "org.gnome.desktop.interface", key];
+}
+
+function gtkSetArgs(key, value) {
+    if (key === "cursor-theme" && (validTheme(value) || value === "default"))
+        return ["gsettings", "set", "org.gnome.desktop.interface", key, value];
+    const n = Math.round(Number(value));
+    if (key === "cursor-size" && n >= 8 && n <= 256)
+        return ["gsettings", "set", "org.gnome.desktop.interface", key, String(n)];
+    return null;
+}
+
+// "'Adwaita'\n" -> "Adwaita", "24\n" -> 24, anything else -> null
+function parseGsetting(key, text) {
+    const t = String(text || "").trim();
+    if (t.length > 80) return null;
+    if (key === "cursor-theme") {
+        const m = /^'([^']*)'$/.exec(t);
+        if (!m || !(validTheme(m[1]) || m[1] === "default")) return null;
+        return OWN_RE.test(m[1]) ? "default" : m[1];   // left on one of ours: nothing to go back to
+    }
+    if (key === "cursor-size") return /^(?:uint32 |int32 )?\d{1,3}$/.test(t) ? parseInt(t.split(" ").pop()) : null;
+    return null;
+}

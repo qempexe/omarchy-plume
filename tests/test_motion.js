@@ -47,7 +47,7 @@ assert.ok(!M.shaken(calm, 20640, 10), "a straight move is not a shake");
 console.log("motion tests: ok");
 
 // ---- the pointer commands ------------------------------------------------------
-const P = new Function(load("Pointer.js") + "; return { iconDirs, scanArgs, parseThemes, setcursorArgs, optionsArgs, getoptionArgs, parseOption, baseTheme };")();
+const P = new Function(load("Pointer.js") + "; return { iconDirs, scanArgs, parseThemes, setcursorArgs, optionsArgs, getoptionArgs, parseOption, baseTheme, xcursorArgs, gtkGetArgs, gtkSetArgs, parseGsetting };")();
 assert.deepStrictEqual(P.iconDirs("/home/me", ""), ["/home/me/.local/share/icons", "/home/me/.icons", "/usr/local/share/icons", "/usr/share/icons"]);
 assert.deepStrictEqual(P.parseThemes("/usr/share/icons/Adwaita\n/home/me/.icons/Bibata-Modern-Ice\n/usr/share/icons/Adwaita\n/usr/share/icons/default\n/x/$(id)\n/x/-rf\n"),
     ["Adwaita", "Bibata-Modern-Ice"], "names, sorted, each once, nothing odd");
@@ -68,6 +68,25 @@ assert.deepStrictEqual(P.setcursorArgs("plume-b", 24), ["hyprctl", "setcursor", 
 assert.deepStrictEqual(P.setcursorArgs("default", 24), ["hyprctl", "setcursor", "default", "24"], "back to the system default");
 assert.deepStrictEqual(P.optionsArgs({ enable_hyprcursor: true }), ["hyprctl", "eval", "hl.config({ cursor = { enable_hyprcursor = true } })"]);
 assert.strictEqual(P.optionsArgs({ enable_hyprcursor: "true" }), null);
+
+// the XCursor copy and GTK's cursor
+assert.deepStrictEqual(P.xcursorArgs("/p/tools/xcursor.py", "/home/me/.local/share/icons/plume-a", 24),
+    ["python3", "-I", "/p/tools/xcursor.py", "/home/me/.local/share/icons/plume-a", "24"]);
+assert.strictEqual(P.xcursorArgs("/p/tools/xcursor.py", "/usr/share/icons/Adwaita", 24), null, "only Plume's own folders");
+assert.strictEqual(P.xcursorArgs("/p/tools/xcursor.py", "/x/../plume-a", 24), null);
+assert.strictEqual(P.xcursorArgs("/tmp/evil.py", "/h/plume-a", 24), null, "only the bundled script");
+assert.strictEqual(P.xcursorArgs("/p/tools/xcursor.py", "/h/plume-a", 1000), null);
+assert.deepStrictEqual(P.gtkGetArgs("cursor-theme"), ["gsettings", "get", "org.gnome.desktop.interface", "cursor-theme"]);
+assert.strictEqual(P.gtkGetArgs("gtk-theme"), null, "only the cursor keys");
+assert.deepStrictEqual(P.gtkSetArgs("cursor-theme", "plume-b"), ["gsettings", "set", "org.gnome.desktop.interface", "cursor-theme", "plume-b"]);
+assert.deepStrictEqual(P.gtkSetArgs("cursor-size", 32), ["gsettings", "set", "org.gnome.desktop.interface", "cursor-size", "32"]);
+assert.strictEqual(P.gtkSetArgs("cursor-theme", "--help"), null);
+assert.strictEqual(P.gtkSetArgs("cursor-size", "24; x"), null);
+assert.strictEqual(P.parseGsetting("cursor-theme", "'Bibata-Modern-Ice'\n"), "Bibata-Modern-Ice");
+assert.strictEqual(P.parseGsetting("cursor-theme", "'plume-a'\n"), "default", "never remembered as the one to go back to");
+assert.strictEqual(P.parseGsetting("cursor-size", "24\n"), 24);
+assert.strictEqual(P.parseGsetting("cursor-size", "uint32 48\n"), 48);
+assert.strictEqual(P.parseGsetting("cursor-theme", "'a'b'"), null);
 assert.deepStrictEqual(P.getoptionArgs("cursor:enable_hyprcursor"), ["hyprctl", "-j", "getoption", "cursor:enable_hyprcursor"]);
 assert.strictEqual(P.baseTheme("Bibata", ""), "Bibata");
 assert.strictEqual(P.baseTheme("plume-a", "Bibata"), "Bibata", "never goes back to its own cursor");

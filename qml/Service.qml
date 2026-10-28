@@ -401,6 +401,9 @@ Item {
             root.pointerStore.set("cursorSlot", name)
             root.applyPointer()
         }
+        onXcursorMade: function(name, size) {
+            if (root.ownCursor && name === forge.builtName && size === root.cfg.pointerSize) root.wearGtk(name, size)
+        }
     }
     readonly property string cursorStatus: forge.error !== "" ? forge.error
         : (forge.busy ? "Making your cursor…" : "")
@@ -437,6 +440,11 @@ Item {
                 pointerStore.set("changed", key !== "")
             }
         }
+        // and as XCursor too, for the programs that only know XCursor; worn there once made
+        if (root.ownCursor && key !== root.xcursorKey) {
+            root.xcursorKey = key
+            forge.xcursor(forge.builtName, root.cfg.pointerSize)
+        }
         // hiding: remember Hyprland's own values the first time they are changed
         const opts = {}
         const saved = pointerStore.values
@@ -465,7 +473,57 @@ Item {
     onPointerKeyChanged: if (startedLook) Qt.callLater(applyPointer)
     // While the cursor made here is not worn, its folders are no themes, so Hyprland never
     // picks one by itself at the next login
-    onOwnCursorChanged: if (startedLook && !ownCursor) forge.retire("")
+    onOwnCursorChanged: if (startedLook && !ownCursor) { forge.retire(""); root.xcursorKey = ""; restoreGtk() }
+
+    // ---- GTK's cursor ---------------------------------------------------------------
+    // GTK 3 programs (WebKitGTK apps among them) draw the cursor themselves from GTK's
+    // cursor theme rather than asking Hyprland, so the XCursor copy is worn there too.
+    // GTK's own theme and size are remembered the first time, and put back when the cursor
+    // made here is taken off.
+    property string xcursorKey: ""
+    property var gtkQueue: []                // [{ argv, get }]
+    function wearGtk(name, size) {
+        const saved = pointerStore.values
+        const q = []
+        if (typeof saved.gtkTheme !== "string")
+            q.push({ argv: Pointer.gtkGetArgs("cursor-theme"), get: "cursor-theme" },
+                   { argv: Pointer.gtkGetArgs("cursor-size"), get: "cursor-size" })
+        q.push({ argv: Pointer.gtkSetArgs("cursor-theme", name) }, { argv: Pointer.gtkSetArgs("cursor-size", size) })
+        queueGtk(q)
+    }
+    function restoreGtk() {
+        const saved = pointerStore.values
+        if (typeof saved.gtkTheme !== "string") return
+        const q = [{ argv: Pointer.gtkSetArgs("cursor-theme", saved.gtkTheme) }]
+        if (typeof saved.gtkSize === "number") q.push({ argv: Pointer.gtkSetArgs("cursor-size", saved.gtkSize) })
+        queueGtk(q)
+        pointerStore.set("gtkTheme", null)
+        pointerStore.set("gtkSize", null)
+    }
+    function queueGtk(items) {
+        root.gtkQueue = root.gtkQueue.concat(items.filter((i) => i.argv))
+        if (!gtkRun.running) nextGtk()
+    }
+    function nextGtk() {
+        if (root.gtkQueue.length === 0) return
+        gtkRun.start(root.gtkQueue[0].argv)
+    }
+    Run {
+        id: gtkRun
+        seconds: 5
+        maxOut: 1024
+        onDone: function(code, out, err) {
+            const item = root.gtkQueue[0]
+            root.gtkQueue = root.gtkQueue.slice(1)
+            if (item && item.get && code === 0) {
+                // only the first reading counts: a later one may already be ours
+                const v = Pointer.parseGsetting(item.get, out)
+                const k = item.get === "cursor-theme" ? "gtkTheme" : "gtkSize"
+                if (v !== null && root.pointerStore.values[k] === undefined) root.pointerStore.set(k, v)
+            }
+            root.nextGtk()
+        }
+    }
 
     // Omarchy reveals the cursor a few seconds into a session, setting its own theme as it
     // does; anything but "As Omarchy sets it" is put back on after that.
