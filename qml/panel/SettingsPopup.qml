@@ -175,9 +175,6 @@ PopupWindow {
     function locate() {
         const item = root.anchorItem
         if (!item) return
-        const scr = item.screen
-        const sw = scr ? scr.width : 1920
-        const sh = scr ? scr.height : 1080
         let side = ""
         let qsWin = null
         let win = null
@@ -185,6 +182,10 @@ PopupWindow {
         // 1. the bar window knows which edges it is attached to
         try { qsWin = item.QsWindow.window } catch (e0) { qsWin = null }
         try { win = qsWin ? qsWin : item.Window.window } catch (e1) { win = null }
+        let scr = null
+        try { scr = win && win.screen ? win.screen : null } catch (e4) { scr = null }
+        const sw = scr && scr.width > 0 ? scr.width : 1920
+        const sh = scr && scr.height > 0 ? scr.height : 1080
         try {
             const an = win ? win.anchors : null
             if (an) {
@@ -220,31 +221,47 @@ PopupWindow {
         root.barAtTop = side === "top"
         root.barAtLeft = side === "left"
 
-        // Anchor rectangle on the bar window's outer edge (window coordinates).
+        // Anchor rectangle on the bar's outer edge (window coordinates).
         const ww = (win && win.width > 0) ? win.width : 0
         const wh = (win && win.height > 0) ? win.height : 0
         const small = root.vertical ? (ww > 0 && ww < sw * 0.5) : (wh > 0 && wh < sh * 0.5)
-        root.useRect = !!qsWin && small
+        // Omarchy 4.5 and later: the bar window spans its screen and the bar is a strip
+        // at its edge, so the panel hangs off the outer edge of that strip
+        const spans = !!qsWin && !small && (root.vertical ? ww >= sw * 0.5 : wh >= sh * 0.5)
+        const bs = root.barObject && typeof root.barObject.barSize === "number" && root.barObject.barSize > 0
+            ? root.barObject.barSize : 0
+        let thick = small ? (root.vertical ? ww : wh) : 40
+        root.useRect = !!qsWin && (small || spans)
         root.anchorWin = qsWin
         if (root.useRect) {
             if (root.vertical) {
+                // the strip ends past the widget, and is at least as thick as the bar
+                const t = small ? ww : Math.max(bs, side === "left" ? pos.x + item.width : ww - pos.x)
                 root.rectW = 1
                 root.rectH = Math.max(1, item.height)
                 root.rectY = pos.y
-                root.rectX = side === "left" ? Math.max(0, ww - 1) : 0
+                root.rectX = side === "left" ? Math.max(0, t - 1) : Math.max(0, ww - t)
+                thick = t
             } else {
+                const t = small ? wh : Math.max(bs, side === "top" ? pos.y + item.height : wh - pos.y)
                 root.rectW = Math.max(1, item.width)
                 root.rectH = 1
                 root.rectX = pos.x
-                root.rectY = side === "top" ? Math.max(0, wh - 1) : 0
+                root.rectY = side === "top" ? Math.max(0, t - 1) : Math.max(0, wh - t)
+                thick = t
             }
             root.extra = 0
         } else {
             root.extra = 6                    // only the widget is known: allow a little for bar padding
         }
 
+        // Set the anchor here rather than with bindings: Quickshell unsets the anchor's
+        // item whenever its window is written, and the other way round, so two bindings
+        // can undo each other and leave the panel with nothing to hang off.
+        if (root.useRect) root.anchor.window = qsWin
+        else root.anchor.item = item
+
         // Tallest the panel may be and still fit between the bar and the far edge.
-        const thick = (!root.vertical && wh > 0 && wh < sh * 0.5) ? wh : 40
         const room = root.vertical ? sh - 40 : sh - thick - root.gap - root.extra - 16
         root.maxHeight = Math.max(300, Math.min(680, room))
     }
@@ -403,8 +420,6 @@ PopupWindow {
     implicitWidth: 470 + root.padLeft + root.padRight
     implicitHeight: Math.min(root.maxHeight, mainCol.implicitHeight + 28) + root.padTop + root.padBottom
 
-    anchor.item: root.useRect ? null : root.anchorItem
-    anchor.window: root.useRect ? root.anchorWin : null
     anchor.rect.x: root.rectX
     anchor.rect.y: root.rectY
     anchor.rect.width: root.rectW
