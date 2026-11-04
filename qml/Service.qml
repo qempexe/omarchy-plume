@@ -193,6 +193,7 @@ Item {
     }
     FileView {
         id: paletteFile
+        printErrors: false                  // a theme switch removes them for a moment
         path: root.themeDir !== "" ? root.themeDir + "/colors.toml" : ""
         watchChanges: true
         onFileChanged: reload()
@@ -205,6 +206,7 @@ Item {
     }
     FileView {
         id: borderLua
+        printErrors: false                  // a theme switch removes them for a moment
         path: root.themeDir !== "" ? root.themeDir + "/hyprland.lua" : ""
         watchChanges: true
         onFileChanged: reload()
@@ -213,6 +215,7 @@ Item {
     }
     FileView {
         id: borderConf
+        printErrors: false                  // a theme switch removes them for a moment
         // only looked at when the theme has no hyprland.lua
         path: root.themeDir !== "" && root.luaMissing ? root.themeDir + "/hyprland.conf" : ""
         watchChanges: true
