@@ -4,6 +4,14 @@ All notable changes to Plume. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-11-04
+
+### Fixed
+
+- On Omarchy 4.5, the settings panel didn't open from the bar. It now hangs off the
+  bar's edge there too.
+- A theme switch no longer leaves warnings about missing theme files in the shell log.
+
 ## [1.1.0] - 2026-10-28
 
 ### Added
